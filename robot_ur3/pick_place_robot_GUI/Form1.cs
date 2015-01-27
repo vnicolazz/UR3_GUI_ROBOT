@@ -308,16 +308,16 @@ namespace pick_place_robot_GUI
             int blue_rect_radial_line_length=0;
 
             
-            Point origin = new Point(137, 162);
-            Point origin_shifted = new Point(319, 162);
-            LineSegment2DF origin_line = new LineSegment2DF(origin, origin_shifted);
+            //Point origin = new Point(137, 162);
+            //Point origin_shifted = new Point(319, 162);
+            //LineSegment2DF origin_line = new LineSegment2DF(origin, origin_shifted);
 
             Image<Bgr, Byte> frame = _capture.RetrieveBgrFrame().Resize(imageBox1.Width, imageBox1.Height, Emgu.CV.CvEnum.INTER.CV_INTER_LINEAR);
             Image<Bgr, Byte> img = frame;       
 
            dispString("Image Size = " + Convert.ToString(img.Width) + " x " + Convert.ToString(img.Height), label1);
             dispString("# of pixels = " + pixel_counter(img).ToString(), label2);
-            img.Draw(new CircleF(origin, 5), new Bgr(Color.Red), 1);
+            //img.Draw(new CircleF(origin, 5), new Bgr(Color.Red), 1);
             imageBox1.Image = img;
 
             Image<Gray, Byte> gray = img.Convert<Gray, Byte>().ThresholdBinary(new Gray(threshold), new Gray(255));//.PyrDown().PyrUp();
@@ -399,16 +399,16 @@ namespace pick_place_robot_GUI
 
             foreach (Triangle2DF triangle in triangleList)
             {
-                LineSegment2DF tri_radial_line = new LineSegment2DF(origin, triangleList[0].Centeroid);
-                triangleRectangleImage.Draw(tri_radial_line, new Bgr(Color.Yellow), 2);
-                triangleRectangleImage.Draw(triangle, new Bgr(Color.Yellow), 2);
+                //LineSegment2DF tri_radial_line = new LineSegment2DF(origin, triangleList[0].Centeroid);
+                //triangleRectangleImage.Draw(tri_radial_line, new Bgr(Color.Yellow), 2);
+               // triangleRectangleImage.Draw(triangle, new Bgr(Color.Yellow), 2);
 
-                comb_color.Draw(tri_radial_line, new Bgr(Color.Yellow), 1);
+                //comb_color.Draw(tri_radial_line, new Bgr(Color.Yellow), 1);
                 comb_color.Draw(triangle, new Bgr(Color.Yellow), 1);
 
                 double _angle = Math.Atan2(triangleList[0].Centeroid.Y-162, triangleList[0].Centeroid.X-137);
                 tri_angle = (int)Math.Abs(_angle * (180 / Math.PI));
-                tri_radial_line_length = (int)tri_radial_line.Length;
+                //tri_radial_line_length = (int)tri_radial_line.Length;
 
                 dispString("Triangle centroid: " + triangleList[0].Centeroid.ToString(), label6);
                 dispString("angle =  " + tri_angle.ToString(), label14);
@@ -416,15 +416,15 @@ namespace pick_place_robot_GUI
             }
             foreach (MCvBox2D box in boxList)
             {
-                LineSegment2DF rect_radial_line = new LineSegment2DF(origin, boxList[0].center);
-                triangleRectangleImage.Draw(rect_radial_line, new Bgr(Color.Pink), 2);
-                triangleRectangleImage.Draw(box, new Bgr(Color.Pink), 2);
-                comb_color.Draw(rect_radial_line, new Bgr(Color.Pink), 1);
+                //LineSegment2DF rect_radial_line = new LineSegment2DF(origin, boxList[0].center);
+                //triangleRectangleImage.Draw(rect_radial_line, new Bgr(Color.Pink), 2);
+                //triangleRectangleImage.Draw(box, new Bgr(Color.Pink), 2);
+                //comb_color.Draw(rect_radial_line, new Bgr(Color.Pink), 1);
                 comb_color.Draw(box, new Bgr(Color.Pink), 1);
 
                 double _angle = Math.Atan2(boxList[0].center.Y - 162, boxList[0].center.X - 137);
                 rect_angle = (int)Math.Abs(_angle * (180 / Math.PI));
-                rect_radial_line_length = (int)rect_radial_line.Length;
+                //rect_radial_line_length = (int)rect_radial_line.Length;
 
                 dispString("Rectangle center: " + boxList[0].center.ToString(), label5);
                 dispString("angle =  " + rect_angle.ToString(), label22);
@@ -466,22 +466,22 @@ namespace pick_place_robot_GUI
 
             foreach (MCvBox2D box in boxList1)
             {
-                LineSegment2DF radial_line = new LineSegment2DF(origin, boxList1[0].center);
+                //LineSegment2DF radial_line = new LineSegment2DF(origin, boxList1[0].center);
                 comb_color.Draw(box, new Bgr(Color.Blue), 1);
-                comb_color.Draw(radial_line, new Bgr(Color.Blue), 1);
+               //comb_color.Draw(radial_line, new Bgr(Color.Blue), 1);
                
                 double _angle = Math.Atan2(boxList1[0].center.Y - 162, boxList1[0].center.X - 137);
                 blue_rect_angle = (int)Math.Abs(_angle * (180 / Math.PI)); 
-                blue_rect_radial_line_length = (int)radial_line.Length;
+                //blue_rect_radial_line_length = (int)radial_line.Length;
 
                 dispString("Rectangle center: " + boxList1[0].center.ToString(), label24);
                 dispString("angle =  " + blue_rect_angle.ToString(), label25);
                 dispString("length =  " + blue_rect_radial_line_length.ToString(), label26);
             }
 
-            comb_color.Draw(new CircleF(origin, 5), new Bgr(Color.Red), 1);
-            comb_color.Draw(origin_line, new Bgr(Color.Red), 1);
-            triangleRectangleImage.Draw(new CircleF(origin, 5), new Bgr(Color.Red), 1);
+            //comb_color.Draw(new CircleF(origin, 5), new Bgr(Color.Red), 1);
+            //comb_color.Draw(origin_line, new Bgr(Color.Red), 1);
+            //triangleRectangleImage.Draw(new CircleF(origin, 5), new Bgr(Color.Red), 1);
 
             dispString("Image Size = " + Convert.ToString(triangleRectangleImage.Width) + " x " + Convert.ToString(triangleRectangleImage.Height), label3);
             dispString("# of pixels = " + pixel_counter(triangleRectangleImage).ToString(), label4);
@@ -623,7 +623,7 @@ namespace pick_place_robot_GUI
                 {serPort.Write("7");                }
 
                 private void button8_Click(object sender, EventArgs e)
-                {serPort.Write("8");                }
+                { serPort.Write("8"); }
         
 
     }
