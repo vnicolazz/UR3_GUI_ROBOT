@@ -307,7 +307,7 @@ namespace pick_place_robot_GUI
             int rect_radial_line_length=0;
             int blue_rect_radial_line_length=0;
 
-            
+
             //Point origin = new Point(137, 162);
             //Point origin_shifted = new Point(319, 162);
             //LineSegment2DF origin_line = new LineSegment2DF(origin, origin_shifted);
@@ -315,7 +315,7 @@ namespace pick_place_robot_GUI
             Image<Bgr, Byte> frame = _capture.RetrieveBgrFrame().Resize(imageBox1.Width, imageBox1.Height, Emgu.CV.CvEnum.INTER.CV_INTER_LINEAR);
             Image<Bgr, Byte> img = frame;       
 
-           dispString("Image Size = " + Convert.ToString(img.Width) + " x " + Convert.ToString(img.Height), label1);
+            dispString("Image Size = " + Convert.ToString(img.Width) + " x " + Convert.ToString(img.Height), label1);
             dispString("# of pixels = " + pixel_counter(img).ToString(), label2);
             //img.Draw(new CircleF(origin, 5), new Bgr(Color.Red), 1);
             imageBox1.Image = img;
@@ -624,7 +624,7 @@ namespace pick_place_robot_GUI
 
                 private void button8_Click(object sender, EventArgs e)
                 { serPort.Write("8"); }
-        
+       
 
     }
 }
