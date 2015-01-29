@@ -67,9 +67,9 @@
             this.button6 = new System.Windows.Forms.Button();
             this.button7 = new System.Windows.Forms.Button();
             this.button8 = new System.Windows.Forms.Button();
-            this.trackBar1 = new System.Windows.Forms.TrackBar();
-            this.trackBar2 = new System.Windows.Forms.TrackBar();
-            this.trackBar3 = new System.Windows.Forms.TrackBar();
+            this.hueBar = new System.Windows.Forms.TrackBar();
+            this.saturationBar = new System.Windows.Forms.TrackBar();
+            this.valueBar = new System.Windows.Forms.TrackBar();
             this.radioButton1 = new System.Windows.Forms.RadioButton();
             this.radioButton2 = new System.Windows.Forms.RadioButton();
             this.radioButton3 = new System.Windows.Forms.RadioButton();
@@ -96,9 +96,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.imageBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.imageBox3)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.imageBox4)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.trackBar2)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.trackBar3)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.hueBar)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.saturationBar)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.valueBar)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar5)).BeginInit();
@@ -453,26 +453,26 @@
             this.button8.UseVisualStyleBackColor = true;
             this.button8.Click += new System.EventHandler(this.button8_Click);
             // 
-            // trackBar1
+            // hueBar
             // 
-            this.trackBar1.Location = new System.Drawing.Point(82, 37);
-            this.trackBar1.Name = "trackBar1";
-            this.trackBar1.Size = new System.Drawing.Size(226, 56);
-            this.trackBar1.TabIndex = 38;
+            this.hueBar.Location = new System.Drawing.Point(82, 37);
+            this.hueBar.Name = "hueBar";
+            this.hueBar.Size = new System.Drawing.Size(226, 56);
+            this.hueBar.TabIndex = 38;
             // 
-            // trackBar2
+            // saturationBar
             // 
-            this.trackBar2.Location = new System.Drawing.Point(82, 99);
-            this.trackBar2.Name = "trackBar2";
-            this.trackBar2.Size = new System.Drawing.Size(226, 56);
-            this.trackBar2.TabIndex = 39;
+            this.saturationBar.Location = new System.Drawing.Point(82, 99);
+            this.saturationBar.Name = "saturationBar";
+            this.saturationBar.Size = new System.Drawing.Size(226, 56);
+            this.saturationBar.TabIndex = 39;
             // 
-            // trackBar3
+            // valueBar
             // 
-            this.trackBar3.Location = new System.Drawing.Point(82, 161);
-            this.trackBar3.Name = "trackBar3";
-            this.trackBar3.Size = new System.Drawing.Size(226, 56);
-            this.trackBar3.TabIndex = 40;
+            this.valueBar.Location = new System.Drawing.Point(82, 161);
+            this.valueBar.Name = "valueBar";
+            this.valueBar.Size = new System.Drawing.Size(226, 56);
+            this.valueBar.TabIndex = 40;
             // 
             // radioButton1
             // 
@@ -512,11 +512,11 @@
             this.groupBox1.Controls.Add(this.label29);
             this.groupBox1.Controls.Add(this.label28);
             this.groupBox1.Controls.Add(this.label27);
-            this.groupBox1.Controls.Add(this.trackBar1);
+            this.groupBox1.Controls.Add(this.hueBar);
             this.groupBox1.Controls.Add(this.radioButton2);
             this.groupBox1.Controls.Add(this.radioButton3);
-            this.groupBox1.Controls.Add(this.trackBar2);
-            this.groupBox1.Controls.Add(this.trackBar3);
+            this.groupBox1.Controls.Add(this.saturationBar);
+            this.groupBox1.Controls.Add(this.valueBar);
             this.groupBox1.Controls.Add(this.radioButton1);
             this.groupBox1.Location = new System.Drawing.Point(12, 294);
             this.groupBox1.Name = "groupBox1";
@@ -753,9 +753,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.imageBox2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.imageBox3)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.imageBox4)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.trackBar2)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.trackBar3)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.hueBar)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.saturationBar)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.valueBar)).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
@@ -808,9 +808,9 @@
         private System.Windows.Forms.Button button6;
         private System.Windows.Forms.Button button7;
         private System.Windows.Forms.Button button8;
-        private System.Windows.Forms.TrackBar trackBar1;
-        private System.Windows.Forms.TrackBar trackBar2;
-        private System.Windows.Forms.TrackBar trackBar3;
+        private System.Windows.Forms.TrackBar hueBar;
+        private System.Windows.Forms.TrackBar saturationBar;
+        private System.Windows.Forms.TrackBar valueBar;
         private System.Windows.Forms.RadioButton radioButton1;
         private System.Windows.Forms.RadioButton radioButton2;
         private System.Windows.Forms.RadioButton radioButton3;

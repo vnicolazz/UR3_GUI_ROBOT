@@ -14,11 +14,19 @@ using Emgu.CV.Structure;
 using Emgu.CV.CvEnum;
 using Emgu.CV.UI;
 
+//typedef struct HSV_joint joint1;
 
 namespace pick_place_robot_GUI
 {
     public partial class Form1 : Form
     {
+        struct HSV_joint
+        {
+            int hue;
+            int saturation;
+            int value;
+        };
+
         Capture _capture = null;
         int threshold = 150;
         delegate void displayStringDelegate(String s, Label label);
@@ -28,8 +36,13 @@ namespace pick_place_robot_GUI
         int v_max = 255;
         int h_min = 80;
         int h_max = 120;
+        HSV_joint joint1;
+        HSV_joint joint2;
+        HSV_joint joint3;
 
-          
+        
+  
+
         //Serial Communication
         enum State { enabled, disabled };
         State s = State.disabled;
@@ -62,7 +75,7 @@ namespace pick_place_robot_GUI
             _capture.Start();
         
             //display_still();
-
+            
         }
 
         //void display_still()
