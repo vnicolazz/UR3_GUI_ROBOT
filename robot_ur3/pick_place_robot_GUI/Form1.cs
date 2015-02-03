@@ -22,9 +22,9 @@ namespace pick_place_robot_GUI
     {
         struct HSV_joint
         {
-            int hue;
-            int saturation;
-            int value;
+            public int hue;
+            public int saturation;
+            public int value;
         };
 
         Capture _capture = null;
@@ -39,6 +39,8 @@ namespace pick_place_robot_GUI
         HSV_joint joint1;
         HSV_joint joint2;
         HSV_joint joint3;
+
+
 
         
   
