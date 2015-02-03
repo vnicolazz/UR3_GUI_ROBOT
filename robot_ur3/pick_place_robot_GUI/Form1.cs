@@ -70,6 +70,7 @@ namespace pick_place_robot_GUI
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            trackBar6.Value = threshold;
             _capture = new Capture();
             _capture.ImageGrabbed += Display_Captured;	//grab event handler
             _capture.Start();
@@ -637,6 +638,11 @@ namespace pick_place_robot_GUI
 
                 private void button8_Click(object sender, EventArgs e)
                 { serPort.Write("8"); }
+
+                private void trackBar6_Scroll(object sender, EventArgs e)
+                {
+                    threshold = trackBar6.Value;
+                }
        
 
     }
