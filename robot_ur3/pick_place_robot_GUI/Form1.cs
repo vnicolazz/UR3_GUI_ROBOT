@@ -30,19 +30,16 @@ namespace pick_place_robot_GUI
         Capture _capture = null;
         int threshold = 150;
         delegate void displayStringDelegate(String s, Label label);
-        int s_min = 80;
-        int s_max = 255;
-        int v_min = 100;
-        int v_max = 255;
-        int h_min = 80;
-        int h_max = 120;
+        //blue HSV values
+        //int s_min = 80;
+        //int s_max = 255;
+        //int v_min = 100;
+        //int v_max = 255;
+        //int h_min = 80;
+        //int h_max = 120;
         HSV_joint joint1;
         HSV_joint joint2;
-        HSV_joint joint3;
-
-
-
-        
+        HSV_joint joint3;        
   
 
         //Serial Communication
@@ -54,6 +51,19 @@ namespace pick_place_robot_GUI
 
         public Form1()
         {
+            //blue
+            joint1.hue = 100;
+            joint1.saturation = 160;
+            joint1.value = 150;
+            //red
+            joint2.hue = 0;
+            joint2.saturation = 100;
+            joint2.value = 50;
+            //green
+            joint3.hue = 140;
+            joint3.saturation = 100;
+            joint3.value = 40;
+
             try
             {
                 serPort = new SerialPort(ComPort);
@@ -340,28 +350,47 @@ namespace pick_place_robot_GUI
             Image<Gray, Byte> cannyEdges = gray.Canny(0, 255);
 
             Image<Bgr, Byte> color_img = img.Resize(imageBox1.Width, imageBox1.Height, Emgu.CV.CvEnum.INTER.CV_INTER_LINEAR);
-            Image<Hsv, Byte> blue_hsv = img.Convert<Hsv, Byte>();
             Image<Hsv, float> img2 = img.Convert<Hsv, float>();
 
-
+            Image<Hsv, Byte> blue_hsv = img.Convert<Hsv, Byte>();
+            Image<Hsv, Byte> red_hsv = img.Convert<Hsv, Byte>();
+            Image<Hsv, Byte> green_hsv = img.Convert<Hsv, Byte>();
             gray = gray.Resize(imageBox1.Width, imageBox1.Height, Emgu.CV.CvEnum.INTER.CV_INTER_LINEAR);
             blue_hsv = blue_hsv.Resize(imageBox1.Width, imageBox1.Height, Emgu.CV.CvEnum.INTER.CV_INTER_LINEAR);
             img2 = img2.Resize(imageBox1.Width, imageBox1.Height, Emgu.CV.CvEnum.INTER.CV_INTER_LINEAR);
 
-            //
+           //
 
-           // imageBox3.Image = gray.Resize(imageBox1.Width, imageBox1.Height, Emgu.CV.CvEnum.INTER.CV_INTER_LINEAR);
-            Image<Gray, Byte>[] channels = blue_hsv.Split();
-            Image<Gray, Byte> imgBlue = channels[0];
-            Image<Gray, Byte> imgGreen = channels[1];
-            Image<Gray, Byte> imgRed = channels[2];
+           // imageBox3.Image 
+            Image<Gray, Byte>[] channels1 = blue_hsv.Split();
+            Image<Gray, Byte> imgBlue1 = channels1[0];
+            Image<Gray, Byte> imgGreen1 = channels1[1];
+            Image<Gray, Byte> imgRed1 = channels1[2];
+            Image<Gray, Byte> bFilter1 = imgBlue1.InRange(new Gray(joint1.hue-30), new Gray(joint1.hue+30));
+            Image<Gray, Byte> gFilter1 = imgGreen1.InRange(new Gray(joint1.saturation-30), new Gray(joint1.saturation+30));
+            Image<Gray, Byte> rFilter1 = imgRed1.InRange(new Gray(joint1.value-30), new Gray(joint1.value+30));
 
-            Image<Gray, Byte> bFilter = imgBlue.InRange(new Gray(h_min), new Gray(h_max));
-            Image<Gray, Byte> gFilter = imgGreen.InRange(new Gray(s_min), new Gray(s_max));
-            Image<Gray, Byte> rFilter = imgRed.InRange(new Gray(v_min), new Gray(v_max));
+            Image<Gray, Byte>[] channels2 = red_hsv.Split();
+            Image<Gray, Byte> imgBlue2 = channels2[0];
+            Image<Gray, Byte> imgGreen2 = channels2[1];
+            Image<Gray, Byte> imgRed2 = channels2[2];
+            Image<Gray, Byte> bFilter2 = imgBlue2.InRange(new Gray(joint2.hue - 30), new Gray(joint2.hue + 30));
+            Image<Gray, Byte> gFilter2 = imgGreen2.InRange(new Gray(joint2.saturation - 30), new Gray(joint2.saturation + 30));
+            Image<Gray, Byte> rFilter2 = imgRed2.InRange(new Gray(joint2.value - 30), new Gray(joint2.value + 30));
 
-            // Combine the filtered componets into one image; Remove noise
-            Image<Gray, Byte> combined = bFilter.And(gFilter).And(rFilter).SmoothMedian(3);
+            Image<Gray, Byte>[] channels3 = green_hsv.Split();
+            Image<Gray, Byte> imgBlue3 = channels3[0];
+            Image<Gray, Byte> imgGreen3 = channels3[1];
+            Image<Gray, Byte> imgRed3 = channels3[2];
+            Image<Gray, Byte> bFilter3 = imgBlue3.InRange(new Gray(joint3.hue - 30), new Gray(joint3.hue + 30));
+            Image<Gray, Byte> gFilter3 = imgGreen3.InRange(new Gray(joint3.saturation - 30), new Gray(joint3.saturation + 30));
+            Image<Gray, Byte> rFilter3 = imgRed3.InRange(new Gray(joint3.value - 30), new Gray(joint3.value + 30));
+
+            // Combine the filtered components into one image; Remove noise
+            Image<Gray, Byte> combined1 = bFilter1.And(gFilter1).And(rFilter1).SmoothMedian(3);                   //.And(bFilter2).And(gFilter2)
+            Image<Gray, Byte> combined2 = bFilter2.And(gFilter2).And(rFilter2).SmoothMedian(3);                                                                                                     //.And(rFilter2).And(bFilter3).And(gFilter3).And(rFilter3).SmoothMedian(3);
+            Image<Gray, Byte> combined3 = bFilter3.And(gFilter3).And(rFilter3).SmoothMedian(3);
+            Image<Gray, Byte> combined = combined1 + combined2 + combined3;
             Image<Bgr, Byte> canny_img = combined.Convert<Bgr, Byte>();
 
             dispString("Image Size = " + Convert.ToString(combined.Width) + " x " + Convert.ToString(combined.Height), label7);
@@ -427,7 +456,7 @@ namespace pick_place_robot_GUI
                 //tri_radial_line_length = (int)tri_radial_line.Length;
 
                 dispString("Triangle centroid: " + triangleList[0].Centeroid.ToString(), label6);
-                dispString("angle =  " + tri_angle.ToString(), label14);
+                //dispString("angle =  " + tri_angle.ToString(), label14);
                 dispString("length =  " + tri_radial_line_length.ToString(), label15);
             }
             foreach (MCvBox2D box in boxList)
@@ -644,6 +673,108 @@ namespace pick_place_robot_GUI
                 private void trackBar6_Scroll(object sender, EventArgs e)
                 {
                     threshold = trackBar6.Value;
+                }
+
+                private void radioButton1_CheckedChanged(object sender, EventArgs e)
+                {
+                    if(radioButton1.Checked)
+                    {
+                        radioButton2.Checked = false;
+                        radioButton3.Checked = false;
+                        hueBar.Value = joint1.hue;
+                        saturationBar.Value = joint1.saturation;
+                        valueBar.Value = joint1.value;
+                        dispString(joint1.hue.ToString(), label12);
+                        dispString(joint1.saturation.ToString(), label13);
+                        dispString(joint1.value.ToString(), label14);
+                    }
+                }
+
+                private void radioButton2_CheckedChanged(object sender, EventArgs e)
+                {
+                    if (radioButton2.Checked)
+                    {
+                        radioButton1.Checked = false;
+                        radioButton3.Checked = false;
+                        hueBar.Value = joint2.hue;
+                        saturationBar.Value = joint2.saturation;
+                        valueBar.Value = joint2.value;
+                        dispString(joint2.hue.ToString(), label12);
+                        dispString(joint2.saturation.ToString(), label13);
+                        dispString(joint2.value.ToString(), label14);
+                    }
+                }
+
+                private void radioButton3_CheckedChanged(object sender, EventArgs e)
+                {
+                    if (radioButton3.Checked)
+                    {
+                        radioButton1.Checked = false;
+                        radioButton2.Checked = false;
+                        hueBar.Value = joint3.hue;
+                        saturationBar.Value = joint3.saturation;
+                        valueBar.Value = joint3.value;
+                        dispString(joint3.hue.ToString(), label12);
+                        dispString(joint3.saturation.ToString(), label13);
+                        dispString(joint3.value.ToString(), label14);
+                    }
+                }
+
+                private void hueBar_Scroll(object sender, EventArgs e)
+                {
+                    if(radioButton1.Checked)
+                    {
+                        joint1.hue = hueBar.Value;
+                        dispString(joint1.hue.ToString(), label12);
+                    }
+                    if (radioButton2.Checked)
+                    {
+                        joint2.hue = hueBar.Value;
+                        dispString(joint2.hue.ToString(), label12);
+                    }
+                    if (radioButton3.Checked)
+                    {
+                        joint3.hue = hueBar.Value;
+                        dispString(joint3.hue.ToString(), label12);
+                    }
+                }
+
+                private void saturationBar_Scroll(object sender, EventArgs e)
+                {
+                    if (radioButton1.Checked)
+                    {
+                        joint1.saturation = saturationBar.Value;
+                        dispString(joint1.saturation.ToString(), label13);
+                    }
+                    if (radioButton2.Checked)
+                    {
+                        joint2.saturation = saturationBar.Value;
+                        dispString(joint2.saturation.ToString(), label13);
+                    }
+                    if (radioButton3.Checked)
+                    {
+                        joint3.saturation = saturationBar.Value;
+                        dispString(joint3.saturation.ToString(), label13);
+                    }
+                }
+
+                private void valueBar_Scroll(object sender, EventArgs e)
+                {
+                    if (radioButton1.Checked)
+                    {
+                        joint1.value = valueBar.Value;
+                        dispString(joint1.value.ToString(), label14);
+                    }
+                    if (radioButton2.Checked)
+                    {
+                        joint2.value = valueBar.Value;
+                        dispString(joint2.value.ToString(), label14);
+                    }
+                    if (radioButton3.Checked)
+                    {
+                        joint3.value = valueBar.Value;
+                        dispString(joint3.value.ToString(), label14);
+                    }
                 }
        
 
