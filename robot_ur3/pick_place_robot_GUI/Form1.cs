@@ -1,4 +1,10 @@
-﻿using System;
+﻿/*
+TO DO: find "sweet spot" for each color range and put into code
+
+
+
+*/
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -57,8 +63,8 @@ namespace pick_place_robot_GUI
             joint1.value = 150;
             //red
             joint2.hue = 0;
-            joint2.saturation = 100;
-            joint2.value = 50;
+            joint2.saturation = 140;
+            joint2.value = 110;
             //green
             joint3.hue = 140;
             joint3.saturation = 100;
@@ -362,6 +368,7 @@ namespace pick_place_robot_GUI
            //
 
            // imageBox3.Image 
+            //blue
             Image<Gray, Byte>[] channels1 = blue_hsv.Split();
             Image<Gray, Byte> imgBlue1 = channels1[0];
             Image<Gray, Byte> imgGreen1 = channels1[1];
@@ -369,15 +376,15 @@ namespace pick_place_robot_GUI
             Image<Gray, Byte> bFilter1 = imgBlue1.InRange(new Gray(joint1.hue-30), new Gray(joint1.hue+30));
             Image<Gray, Byte> gFilter1 = imgGreen1.InRange(new Gray(joint1.saturation-30), new Gray(joint1.saturation+30));
             Image<Gray, Byte> rFilter1 = imgRed1.InRange(new Gray(joint1.value-30), new Gray(joint1.value+30));
-
+            //red
             Image<Gray, Byte>[] channels2 = red_hsv.Split();
             Image<Gray, Byte> imgBlue2 = channels2[0];
             Image<Gray, Byte> imgGreen2 = channels2[1];
             Image<Gray, Byte> imgRed2 = channels2[2];
-            Image<Gray, Byte> bFilter2 = imgBlue2.InRange(new Gray(joint2.hue - 30), new Gray(joint2.hue + 30));
-            Image<Gray, Byte> gFilter2 = imgGreen2.InRange(new Gray(joint2.saturation - 30), new Gray(joint2.saturation + 30));
+            Image<Gray, Byte> bFilter2 = imgBlue2.InRange(new Gray(joint2.hue - 40), new Gray(joint2.hue + 40));
+            Image<Gray, Byte> gFilter2 = imgGreen2.InRange(new Gray(joint2.saturation - 40), new Gray(joint2.saturation + 40));
             Image<Gray, Byte> rFilter2 = imgRed2.InRange(new Gray(joint2.value - 30), new Gray(joint2.value + 30));
-
+            //green
             Image<Gray, Byte>[] channels3 = green_hsv.Split();
             Image<Gray, Byte> imgBlue3 = channels3[0];
             Image<Gray, Byte> imgGreen3 = channels3[1];
