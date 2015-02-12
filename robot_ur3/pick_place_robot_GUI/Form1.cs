@@ -789,25 +789,34 @@ namespace pick_place_robot_GUI
                     byte[] outByte = new byte[4];
                     outByte[0] = (byte)Convert.ToInt32(textBox1.Text);  //joint1
                     outByte[1] = (byte)Convert.ToInt32(textBox2.Text);  //joint2
-                    outByte[2] = (byte)Convert.ToInt32(textBox3.Text);  //joint3
+                    //outByte[2] = (byte)Convert.ToInt32(textBox3.Text);  //joint3
 
-                    if (radioButton4.Checked)    //magnet pick
+                    if (radioButton4.Checked)    //pick
                     {
-                        outByte[3] = (byte)Convert.ToInt32(90);  
+                        outByte[2] = (byte)Convert.ToInt32(90);  
                         radioButton5.Checked = false;
                         radioButton6.Checked = false;
                     }
-                    else if (radioButton5.Checked)    //magnet move
+                    else if (radioButton5.Checked)    //move
                     {
-                        outByte[3] = (byte)Convert.ToInt32(140);  
+                        outByte[2] = (byte)Convert.ToInt32(140);  
                         radioButton4.Checked = false;
                         radioButton6.Checked = false;
                     }
-                    else if (radioButton6.Checked)    //magnet drop
+                    else if (radioButton6.Checked)    //drop
                     {
-                        outByte[3] = (byte)Convert.ToInt32(110);  
+                        outByte[2] = (byte)Convert.ToInt32(110);  
                         radioButton4.Checked = false;
                         radioButton5.Checked = false;
+                    }
+
+                    if (radioButton7.Checked)    //magnet on
+                    {
+                        outByte[3] = (byte)Convert.ToInt32(1);
+                    }
+                    else    //magnet off
+                    {
+                        outByte[3] = (byte)Convert.ToInt32(0);
                     }
 
                     serPort.Write(outByte, 0, 4);
