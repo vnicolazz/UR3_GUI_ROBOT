@@ -78,6 +78,7 @@
             this.label28 = new System.Windows.Forms.Label();
             this.label27 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.textBox3 = new System.Windows.Forms.TextBox();
             this.radioButton7 = new System.Windows.Forms.RadioButton();
             this.label33 = new System.Windows.Forms.Label();
             this.radioButton6 = new System.Windows.Forms.RadioButton();
@@ -92,8 +93,8 @@
             this.trackBar4 = new System.Windows.Forms.TrackBar();
             this.trackBar6 = new System.Windows.Forms.TrackBar();
             this.label34 = new System.Windows.Forms.Label();
-            this.textBox3 = new System.Windows.Forms.TextBox();
             this.textBox4 = new System.Windows.Forms.TextBox();
+            this.button9 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.imageBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.imageBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.imageBox3)).BeginInit();
@@ -568,6 +569,7 @@
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.button9);
             this.groupBox2.Controls.Add(this.textBox3);
             this.groupBox2.Controls.Add(this.radioButton7);
             this.groupBox2.Controls.Add(this.label33);
@@ -587,6 +589,13 @@
             this.groupBox2.TabIndex = 45;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Manual Joint Control";
+            // 
+            // textBox3
+            // 
+            this.textBox3.Location = new System.Drawing.Point(206, 197);
+            this.textBox3.Name = "textBox3";
+            this.textBox3.Size = new System.Drawing.Size(100, 22);
+            this.textBox3.TabIndex = 12;
             // 
             // radioButton7
             // 
@@ -670,16 +679,16 @@
             // 
             // textBox2
             // 
-            this.textBox2.Location = new System.Drawing.Point(190, 118);
+            this.textBox2.Location = new System.Drawing.Point(206, 118);
             this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(81, 22);
+            this.textBox2.Size = new System.Drawing.Size(100, 22);
             this.textBox2.TabIndex = 3;
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(190, 31);
+            this.textBox1.Location = new System.Drawing.Point(206, 32);
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(81, 22);
+            this.textBox1.Size = new System.Drawing.Size(100, 22);
             this.textBox1.TabIndex = 2;
             // 
             // trackBar5
@@ -714,19 +723,22 @@
             this.label34.TabIndex = 47;
             this.label34.Text = "Threshold:";
             // 
-            // textBox3
-            // 
-            this.textBox3.Location = new System.Drawing.Point(212, 229);
-            this.textBox3.Name = "textBox3";
-            this.textBox3.Size = new System.Drawing.Size(100, 22);
-            this.textBox3.TabIndex = 12;
-            // 
             // textBox4
             // 
             this.textBox4.Location = new System.Drawing.Point(837, 294);
             this.textBox4.Name = "textBox4";
             this.textBox4.Size = new System.Drawing.Size(100, 22);
             this.textBox4.TabIndex = 48;
+            // 
+            // button9
+            // 
+            this.button9.Location = new System.Drawing.Point(231, 297);
+            this.button9.Name = "button9";
+            this.button9.Size = new System.Drawing.Size(75, 23);
+            this.button9.TabIndex = 13;
+            this.button9.Text = "Send";
+            this.button9.UseVisualStyleBackColor = true;
+            this.button9.Click += new System.EventHandler(this.button9_Click);
             // 
             // Form1
             // 
@@ -864,6 +876,7 @@
         private System.Windows.Forms.Label label34;
         private System.Windows.Forms.TextBox textBox3;
         private System.Windows.Forms.TextBox textBox4;
+        private System.Windows.Forms.Button button9;
     }
 }
 

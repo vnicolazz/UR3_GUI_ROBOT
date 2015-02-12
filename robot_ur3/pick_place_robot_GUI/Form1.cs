@@ -783,6 +783,39 @@ namespace pick_place_robot_GUI
                         dispString(joint3.value.ToString(), label14);
                     }
                 }
+
+                private void button9_Click(object sender, EventArgs e)
+                {
+                    byte[] outByte = new byte[4];
+                    outByte[0] = (byte)Convert.ToInt32(textBox1.Text);  //joint1
+                    outByte[1] = (byte)Convert.ToInt32(textBox2.Text);  //joint2
+                    outByte[2] = (byte)Convert.ToInt32(textBox3.Text);  //joint3
+
+                    if (radioButton4.Checked)    //magnet pick
+                    {
+                        outByte[3] = (byte)Convert.ToInt32(90);  
+                        radioButton5.Checked = false;
+                        radioButton6.Checked = false;
+                    }
+                    else if (radioButton5.Checked)    //magnet move
+                    {
+                        outByte[3] = (byte)Convert.ToInt32(140);  
+                        radioButton4.Checked = false;
+                        radioButton6.Checked = false;
+                    }
+                    else if (radioButton6.Checked)    //magnet drop
+                    {
+                        outByte[3] = (byte)Convert.ToInt32(110);  
+                        radioButton4.Checked = false;
+                        radioButton5.Checked = false;
+                    }
+
+                    serPort.Write(outByte, 0, 4);
+                    //label1.Text = Convert.ToString(outByte[0]);
+                    //label2.Text = Convert.ToString(outByte[1]);
+                    //label3.Text = Convert.ToString(outByte[2]);
+                    //label4.Text = Convert.ToString(outByte[3]);
+                }
        
 
     }
