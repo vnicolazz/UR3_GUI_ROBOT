@@ -53,7 +53,7 @@ namespace pick_place_robot_GUI
         State s = State.disabled;
         SerialPort serPort;
         delegate void displayStringDel(String data);
-        string ComPort = "COM5";    //must check by going into Device Manager
+        string ComPort = "COM3";    //must check by going into Device Manager
 
         public Form1()
         {
@@ -89,7 +89,14 @@ namespace pick_place_robot_GUI
         private void Form1_Load(object sender, EventArgs e)
         {
             trackBar6.Value = threshold;
-            _capture = new Capture();
+            radioButton1.Checked = true;
+            trackBar4.Value = 70;
+            trackBar5.Value = 40;
+            textBox1.Text = trackBar4.Value.ToString();
+            textBox2.Text = trackBar5.Value.ToString(); ;
+            radioButton5.Checked = true;
+
+            _capture = new Capture(1);
             _capture.ImageGrabbed += Display_Captured;	//grab event handler
             _capture.Start();
         
@@ -680,6 +687,8 @@ namespace pick_place_robot_GUI
                 private void trackBar6_Scroll(object sender, EventArgs e)
                 {
                     threshold = trackBar6.Value;
+                    textBox4.Text = trackBar6.Value.ToString();
+
                 }
 
                 private void radioButton1_CheckedChanged(object sender, EventArgs e)
@@ -793,37 +802,55 @@ namespace pick_place_robot_GUI
 
                     if (radioButton4.Checked)    //pick
                     {
-                        outByte[2] = (byte)Convert.ToInt32(90);  
-                        radioButton5.Checked = false;
-                        radioButton6.Checked = false;
+                        outByte[2] = (byte)Convert.ToInt32(90);
                     }
                     else if (radioButton5.Checked)    //move
                     {
-                        outByte[2] = (byte)Convert.ToInt32(140);  
-                        radioButton4.Checked = false;
-                        radioButton6.Checked = false;
+                        outByte[2] = (byte)Convert.ToInt32(140);
                     }
                     else if (radioButton6.Checked)    //drop
                     {
-                        outByte[2] = (byte)Convert.ToInt32(110);  
-                        radioButton4.Checked = false;
-                        radioButton5.Checked = false;
+                        outByte[2] = (byte)Convert.ToInt32(110);
                     }
 
-                    if (radioButton7.Checked)    //magnet on
-                    {
+                    //State of Checkbox determines state of magnet
+                    if (checkBox1.Checked)
                         outByte[3] = (byte)Convert.ToInt32(1);
-                    }
-                    else    //magnet off
-                    {
+                    else
                         outByte[3] = (byte)Convert.ToInt32(0);
-                    }
 
                     serPort.Write(outByte, 0, 4);
                     //label1.Text = Convert.ToString(outByte[0]);
                     //label2.Text = Convert.ToString(outByte[1]);
                     //label3.Text = Convert.ToString(outByte[2]);
                     //label4.Text = Convert.ToString(outByte[3]);
+                }
+
+                private void radioButton4_CheckedChanged(object sender, EventArgs e)
+                {
+                    textBox3.Text = Convert.ToString(90);
+                }
+
+                private void radioButton5_CheckedChanged(object sender, EventArgs e)
+                {
+                    textBox3.Text = Convert.ToString(140);
+                }
+
+                private void radioButton6_CheckedChanged(object sender, EventArgs e)
+                {
+                    textBox3.Text = Convert.ToString(110);
+                }
+
+                private void trackBar4_Scroll(object sender, EventArgs e)
+                {
+                    textBox1.Text = trackBar4.Value.ToString();
+                    button9.PerformClick();
+                }
+
+                private void trackBar5_Scroll(object sender, EventArgs e)
+                {
+                    textBox2.Text = trackBar5.Value.ToString();
+                    button9.PerformClick();
                 }
        
 
