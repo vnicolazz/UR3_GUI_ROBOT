@@ -53,7 +53,7 @@ namespace pick_place_robot_GUI
         State s = State.disabled;
         SerialPort serPort;
         delegate void displayStringDel(String data);
-        string ComPort = "COM3";    //must check by going into Device Manager
+        string ComPort = "COM6";    //must check by going into Device Manager
 
         public Form1()
         {
@@ -73,7 +73,7 @@ namespace pick_place_robot_GUI
             try
             {
                 serPort = new SerialPort(ComPort);
-                serPort.BaudRate = 115200;
+                serPort.BaudRate = 9600;
                 serPort.DataBits = 8;
                 serPort.Parity = Parity.None;
                 serPort.StopBits = StopBits.One;
@@ -96,7 +96,7 @@ namespace pick_place_robot_GUI
             textBox2.Text = trackBar5.Value.ToString(); ;
             radioButton5.Checked = true;
 
-            _capture = new Capture(1);
+            _capture = new Capture();
             _capture.ImageGrabbed += Display_Captured;	//grab event handler
             _capture.Start();
         
@@ -796,30 +796,30 @@ namespace pick_place_robot_GUI
                 private void button9_Click(object sender, EventArgs e)
                 {
                     byte[] outByte = new byte[4];
-                    outByte[0] = (byte)Convert.ToInt32(textBox1.Text);  //joint1
-                    outByte[1] = (byte)Convert.ToInt32(textBox2.Text);  //joint2
+                    outByte[0] = Byte.Parse(textBox1.Text);  //joint1
+                    outByte[1] = Byte.Parse(textBox2.Text);  //joint2
                     //outByte[2] = (byte)Convert.ToInt32(textBox3.Text);  //joint3
 
                     if (radioButton4.Checked)    //pick
                     {
-                        outByte[2] = (byte)Convert.ToInt32(90);
+                        outByte[2] = (byte)(90);
                     }
                     else if (radioButton5.Checked)    //move
                     {
-                        outByte[2] = (byte)Convert.ToInt32(140);
+                        outByte[2] = (byte)(140);
                     }
                     else if (radioButton6.Checked)    //drop
                     {
-                        outByte[2] = (byte)Convert.ToInt32(110);
+                        outByte[2] = (byte)(30);
                     }
 
                     //State of Checkbox determines state of magnet
                     if (checkBox1.Checked)
-                        outByte[3] = (byte)Convert.ToInt32(1);
+                        outByte[3] = (byte)(1);
                     else
-                        outByte[3] = (byte)Convert.ToInt32(0);
+                        outByte[3] = (byte)(0);
 
-                    serPort.Write(outByte, 0, 4);
+                    serPort.Write(outByte, 0, outByte.Length);
                     //label1.Text = Convert.ToString(outByte[0]);
                     //label2.Text = Convert.ToString(outByte[1]);
                     //label3.Text = Convert.ToString(outByte[2]);
@@ -838,7 +838,7 @@ namespace pick_place_robot_GUI
 
                 private void radioButton6_CheckedChanged(object sender, EventArgs e)
                 {
-                    textBox3.Text = Convert.ToString(110);
+                    textBox3.Text = Convert.ToString(30);
                 }
 
                 private void trackBar4_Scroll(object sender, EventArgs e)
