@@ -1,7 +1,8 @@
 ﻿/*
 TO DO: find "sweet spot" for each color range and put into code
-
-
+        eliminate flashing shape problem
+ *          --> maybe by saving previous shape location and drawing previous
+        clean up unused functions
 
 */
 using System;
@@ -109,9 +110,8 @@ namespace pick_place_robot_GUI
             int tri_radial_line_length=0;
             int rect_radial_line_length=0;
             int blue_rect_radial_line_length=0;
-
-
-            //Point origin = new Point(137, 162);
+            
+            PointF origin = new PointF(0,0);
             //Point origin_shifted = new Point(319, 162);
             //LineSegment2DF origin_line = new LineSegment2DF(origin, origin_shifted);
 
@@ -231,7 +231,7 @@ namespace pick_place_robot_GUI
             {
                 //LineSegment2DF tri_radial_line = new LineSegment2DF(origin, triangleList[0].Centeroid);
                 //triangleRectangleImage.Draw(tri_radial_line, new Bgr(Color.Yellow), 2);
-               // triangleRectangleImage.Draw(triangle, new Bgr(Color.Yellow), 2);
+               // triangleRectangleImage.Draw(triangle, new Bgr(Color.Yellow), 2);        
 
                 //comb_color.Draw(tri_radial_line, new Bgr(Color.Yellow), 1);
                 comb_color.Draw(triangle, new Bgr(Color.Yellow), 1);
@@ -265,15 +265,20 @@ namespace pick_place_robot_GUI
             //****************************HSV Shape Detection**********************************
             //*********************************************************************************
 
-            for (int j = 0; j < 3; j++)
-            {
                 List<MCvBox2D> boxList1 = new List<MCvBox2D>();
                 using (MemStorage storage = new MemStorage()) //allocate storage for contour approximation
-                    for (Contour<Point> contours = hsvImg[j].FindContours(); contours != null; contours = contours.HNext)
+                    for (Contour<Point> contours = hsvImg[0].FindContours(); contours != null; contours = contours.HNext)
                     {   // a contour: list of pixels that can represent a curve
                         Contour<Point> currentPolygon = contours.ApproxPoly(contours.Perimeter * 0.05, storage); // adjust here
                         if (contours.Area > 20 && contours.Area < 200)//only consider contours with area greater than 250
                         {
+                            if (currentPolygon.Total == 3) //The contour has 3 vertices, it is a triangle
+                            {
+                                //bool isTriangle = true;
+                                Point[] pts = currentPolygon.ToArray();
+                                LineSegment2D[] edges = PointCollection.PolyLine(pts, true);
+                                triangleList.Add(new Triangle2DF(pts[0], pts[1], pts[2]));
+                            }
                             if (currentPolygon.Total == 4) //The contour has 4 vertices.
                             {
                                 bool isRectangle = true;
@@ -298,43 +303,47 @@ namespace pick_place_robot_GUI
                     }
 
                 //combined = combined.Convert<Bgr, Byte>();
+                foreach (Triangle2DF triangle in triangleList)
+                {
+                    //LineSegment2DF tri_radial_line = new LineSegment2DF(origin, triangleList[0].Centeroid);
+                    //triangleRectangleImage.Draw(tri_radial_line, new Bgr(Color.Yellow), 2);
+                    // triangleRectangleImage.Draw(triangle, new Bgr(Color.Yellow), 2);
 
+                    origin = new PointF(triangleList[0].Centeroid.X, triangleList[0].Centeroid.Y);
+                    //comb_color.Draw(tri_radial_line, new Bgr(Color.Yellow), 1);
+                    comb_color.Draw(triangle, new Bgr(Color.Blue), 1);
+
+                    //double _angle = Math.Atan2(triangleList[0].Centeroid.Y - 162, triangleList[0].Centeroid.X - 137);
+                    //tri_angle = (int)Math.Abs(_angle * (180 / Math.PI));
+                    //tri_radial_line_length = (int)tri_radial_line.Length;
+
+                    dispString("Triangle centroid: " + triangleList[0].Centeroid.ToString(), label6);
+                    //dispString("angle =  " + tri_angle.ToString(), label14);
+                    dispString("length =  " + tri_radial_line_length.ToString(), label15);
+                }
                 foreach (MCvBox2D box in boxList1)
                 {
-                    switch (j)
-                    {
-                        case 0:
-                        {
-                            comb_color.Draw(box, new Bgr(Color.Blue), 1);
-                            break;
-                        }
-                        case 1:
-                        {
-                            comb_color.Draw(box, new Bgr(Color.Red), 1);
-                            break;
-                        }
-                        case 2:
-                        {
-                            comb_color.Draw(box, new Bgr(Color.Green), 1);
-                            break;
-                        }
-                    }
+                    comb_color.Draw(box, new Bgr(Color.Blue), 1);
+                }
+                if (boxList1.Count > 1)
+                {
+                    LineSegment2DF radial_line = new LineSegment2DF(boxList1[0].center, boxList1[1].center);
+                    LineSegment2DF tri_radial_line = new LineSegment2DF(origin, boxList1[0].center);
+                    comb_color.Draw(radial_line, new Bgr(Color.Silver), 5);
+                    comb_color.Draw(tri_radial_line, new Bgr(Color.Silver), 5);
 
 
-                    //LineSegment2DF radial_line = new LineSegment2DF(origin, boxList1[0].center);
+                }
                    
-                    //comb_color.Draw(radial_line, new Bgr(Color.Blue), 1);
+                    
 
-                    double _angle = Math.Atan2(boxList1[0].center.Y - 162, boxList1[0].center.X - 137);
-                    blue_rect_angle = (int)Math.Abs(_angle * (180 / Math.PI));
+                    //double _angle = Math.Atan2(boxList1[0].center.Y - 162, boxList1[0].center.X - 137);
+                    //blue_rect_angle = (int)Math.Abs(_angle * (180 / Math.PI));
                     //blue_rect_radial_line_length = (int)radial_line.Length;
 
-                    dispString("Rectangle center: " + boxList1[0].center.ToString(), label24);
-                    dispString("angle =  " + blue_rect_angle.ToString(), label25);
-                    dispString("length =  " + blue_rect_radial_line_length.ToString(), label26);
-                }
-
-            }
+                    //dispString("Rectangle center: " + boxList1[0].center.ToString(), label24);
+                   // dispString("angle =  " + blue_rect_angle.ToString(), label25);
+                    //dispString("length =  " + blue_rect_radial_line_length.ToString(), label26);            
 
             //comb_color.Draw(new CircleF(origin, 5), new Bgr(Color.Red), 1);
             //comb_color.Draw(origin_line, new Bgr(Color.Red), 1);
@@ -348,26 +357,6 @@ namespace pick_place_robot_GUI
             dispString("# of pixels = " + pixel_counter(comb_color).ToString(), label11);
             imageBox4.Image = comb_color;//.Resize(imageBox1.Width, imageBox1.Height, Emgu.CV.CvEnum.INTER.CV_INTER_LINEAR);
 
-            //if (rect_angle + rect_radial_line_length != 0)
-            //{
-            //    if (rect_angle > blue_rect_angle)
-            //        serialTalk("serv_OUT");
-            //    else if (rect_angle < blue_rect_angle)
-            //        serialTalk("serv_IN");
-            //    else if (rect_radial_line_length > blue_rect_radial_line_length)
-            //        serialTalk("step_OUT");
-            //    else if (rect_radial_line_length < blue_rect_radial_line_length)
-            //        serialTalk("step_IN");
-            //    else if (rect_angle == blue_rect_angle && rect_radial_line_length == blue_rect_radial_line_length)
-            //        serialTalk("mag_ON");
-                //else
-                //{
-                //    serialTalk("step_OFF");
-                //    serialTalk("serv_OFF");
-                //    serialTalk("serv2_OFF");
-                //    serialTalk("mag_OFF");
-                //}
-            //}
         }
 
         public int pixel_counter(Image<Bgr, Byte> image)
