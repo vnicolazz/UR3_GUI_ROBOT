@@ -73,7 +73,7 @@ namespace pick_place_robot_GUI
             try
             {
                 serPort = new SerialPort(ComPort);
-                serPort.BaudRate = 115200;
+                serPort.BaudRate = 9600;
                 serPort.DataBits = 8;
                 serPort.Parity = Parity.None;
                 serPort.StopBits = StopBits.One;
@@ -96,7 +96,7 @@ namespace pick_place_robot_GUI
             textBox2.Text = trackBar5.Value.ToString(); ;
             radioButton5.Checked = true;
 
-            _capture = new Capture(0);
+            _capture = new Capture(1);
             _capture.ImageGrabbed += Display_Captured;	//grab event handler
             _capture.Start();            
         }
@@ -549,7 +549,7 @@ namespace pick_place_robot_GUI
                     }
                     else if (radioButton5.Checked)    //move
                     {
-                        outByte[2] = (byte)Convert.ToInt32(140);
+                        outByte[2] = (byte)Convert.ToInt32(40);
                     }
                     else if (radioButton6.Checked)    //drop
                     {
@@ -572,16 +572,20 @@ namespace pick_place_robot_GUI
                 private void radioButton4_CheckedChanged(object sender, EventArgs e)
                 {
                     textBox3.Text = Convert.ToString(90);
+                    checkBox1.Checked = true;
+                    button9.PerformClick();
                 }
 
                 private void radioButton5_CheckedChanged(object sender, EventArgs e)
                 {
-                    textBox3.Text = Convert.ToString(140);
+                    textBox3.Text = Convert.ToString(40);
+                    button9.PerformClick();
                 }
 
                 private void radioButton6_CheckedChanged(object sender, EventArgs e)
                 {
                     textBox3.Text = Convert.ToString(110);
+                    button9.PerformClick();
                 }
 
                 private void trackBar4_Scroll(object sender, EventArgs e)
@@ -593,6 +597,11 @@ namespace pick_place_robot_GUI
                 private void trackBar5_Scroll(object sender, EventArgs e)
                 {
                     textBox2.Text = trackBar5.Value.ToString();
+                    button9.PerformClick();
+                }
+
+                private void checkBox1_CheckedChanged(object sender, EventArgs e)
+                {
                     button9.PerformClick();
                 }
        
