@@ -627,9 +627,32 @@ namespace pick_place_robot_GUI
                         }
                         catch
                         { button10.Text = "Try again"; }
-
-                        
                     }
+
+                }
+
+                private void textBox2_TextChanged(object sender, EventArgs e)
+                {
+                    if(int.Parse(textBox2.Text) > 180)
+                    { textBox2.Text = "180";}
+
+                    if (int.Parse(textBox2.Text) < 0)
+                    { textBox2.Text = "0"; }
+
+                    if(trackBar5.Value.ToString() != textBox2.Text)
+                    { trackBar5.Value = int.Parse(textBox2.Text); }
+                }
+
+                private void textBox1_TextChanged(object sender, EventArgs e)
+                {
+                    if (int.Parse(textBox1.Text) > 180)
+                    { textBox1.Text = "180"; }
+
+                    if (int.Parse(textBox1.Text) < 0)
+                    { textBox1.Text = "0"; }
+
+                    if (trackBar4.Value.ToString() != textBox1.Text)
+                    { trackBar4.Value = int.Parse(textBox1.Text); }
 
                 }
        
