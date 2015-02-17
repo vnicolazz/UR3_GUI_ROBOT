@@ -1,9 +1,19 @@
 ﻿/*
-TO DO: find "sweet spot" for each color range and put into code
-        eliminate flashing shape problem
- *          --> maybe by saving previous shape location and drawing previous
-        clean up unused functions
-
+TO DO: 
+ 
+ * find "sweet spot" for blue "painter's tape"
+ * eliminate flashing shape problem
+      * maybe by saving previous shape location and drawing previous
+ * clean up unused functions
+Note: 
+ * line 55: check ComPort
+ * line 75: check Baud rate
+ * line 83: Nathan added something here to show exceptions but did not upload to GitHub
+ * line 98: Capture() (internal cam) or Capture(1) (external cam) used to rid errors
+ * line 549: has been commented to run without arduino attached (was giving errors)
+ * to show line numbers: "TOOLS"-->"Options"-->"Text Editor"-->"C#"-->"General"-->"Settings"
+Resources:
+ * http://colorizer.org/
 */
 using System;
 using System.Collections.Generic;
@@ -26,34 +36,23 @@ namespace pick_place_robot_GUI
 {
     public partial class Form1 : Form
     {
+        Capture _capture = null;
+        int threshold = 150;
+        delegate void displayStringDelegate(String s, Label label);
+
         struct HSV_joint
         {
             public int hue;
             public int saturation;
             public int value;
-        };
-
-        Capture _capture = null;
-        int threshold = 150;
-        delegate void displayStringDelegate(String s, Label label);
-        //blue HSV values
-        //int s_min = 80;
-        //int s_max = 255;
-        //int v_min = 100;
-        //int v_max = 255;
-        //int h_min = 80;
-        //int h_max = 120;
-        HSV_joint joint1;
-        HSV_joint joint2;
-        HSV_joint joint3;        
-  
-
+        }; HSV_joint joint1; HSV_joint joint2; HSV_joint joint3; 
+        
         //Serial Communication
         enum State { enabled, disabled };
         State s = State.disabled;
         SerialPort serPort;
         delegate void displayStringDel(String data);
-        string ComPort = "COM3";    //must check by going into Device Manager
+        string ComPort = "COM4";    //must check by going into Device Manager
 
         public Form1()
         {
@@ -81,7 +80,7 @@ namespace pick_place_robot_GUI
                 serPort.DataReceived += new SerialDataReceivedEventHandler(serPort_DataReceived);
                 label17.Text = ComPort;
             }
-            catch { }
+            catch { }   //NATHAN: DIDNT YOU ADD SOMETHING HERE?
 
             InitializeComponent();
         }
@@ -96,22 +95,22 @@ namespace pick_place_robot_GUI
             textBox2.Text = trackBar5.Value.ToString(); ;
             radioButton5.Checked = true;
 
-            _capture = new Capture(1);
+            _capture = new Capture();
             _capture.ImageGrabbed += Display_Captured;	//grab event handler
             _capture.Start();            
         }
 
         void Display_Captured(object sender, EventArgs e)
         {
-            bool hasPlate = false;
+            
             int tri_angle = 0;
             int rect_angle = 0;
             int blue_rect_angle = 0;
             int tri_radial_line_length=0;
             int rect_radial_line_length=0;
-            int blue_rect_radial_line_length=0;
-            
             PointF origin = new PointF(0,0);
+            //bool hasPlate = false;
+            //int blue_rect_radial_line_length=0;
             //Point origin_shifted = new Point(319, 162);
             //LineSegment2DF origin_line = new LineSegment2DF(origin, origin_shifted);
 
@@ -145,46 +144,21 @@ namespace pick_place_robot_GUI
             Image<Gray, Byte> bFilter1 = imgBlue1.InRange(new Gray(joint1.hue-30), new Gray(joint1.hue+30));
             Image<Gray, Byte> gFilter1 = imgGreen1.InRange(new Gray(joint1.saturation-30), new Gray(joint1.saturation+30));
             Image<Gray, Byte> rFilter1 = imgRed1.InRange(new Gray(joint1.value-30), new Gray(joint1.value+30));
-            //red
-            Image<Gray, Byte>[] channels2 = red_hsv.Split();
-            Image<Gray, Byte> imgBlue2 = channels2[0];
-            Image<Gray, Byte> imgGreen2 = channels2[1];
-            Image<Gray, Byte> imgRed2 = channels2[2];
-            Image<Gray, Byte> bFilter2 = imgBlue2.InRange(new Gray(joint2.hue - 40), new Gray(joint2.hue + 40));
-            Image<Gray, Byte> gFilter2 = imgGreen2.InRange(new Gray(joint2.saturation - 40), new Gray(joint2.saturation + 40));
-            Image<Gray, Byte> rFilter2 = imgRed2.InRange(new Gray(joint2.value - 30), new Gray(joint2.value + 30));
-            //green
-            Image<Gray, Byte>[] channels3 = green_hsv.Split();
-            Image<Gray, Byte> imgBlue3 = channels3[0];
-            Image<Gray, Byte> imgGreen3 = channels3[1];
-            Image<Gray, Byte> imgRed3 = channels3[2];
-            Image<Gray, Byte> bFilter3 = imgBlue3.InRange(new Gray(joint3.hue - 30), new Gray(joint3.hue + 30));
-            Image<Gray, Byte> gFilter3 = imgGreen3.InRange(new Gray(joint3.saturation - 30), new Gray(joint3.saturation + 30));
-            Image<Gray, Byte> rFilter3 = imgRed3.InRange(new Gray(joint3.value - 30), new Gray(joint3.value + 30));
 
-            // Combine the filtered HSV components into one image; Remove noise
-            Image<Gray, Byte> combined1 = bFilter1.And(gFilter1).And(rFilter1).SmoothMedian(3);                   //.And(bFilter2).And(gFilter2)
-            Image<Gray, Byte> combined2 = bFilter2.And(gFilter2).And(rFilter2).SmoothMedian(3);                                                                                                     //.And(rFilter2).And(bFilter3).And(gFilter3).And(rFilter3).SmoothMedian(3);
-            Image<Gray, Byte> combined3 = bFilter3.And(gFilter3).And(rFilter3).SmoothMedian(3);
-
-            Image<Gray, Byte>[] hsvImg = new Image<Gray,Byte>[3];
-            hsvImg[0] = combined1;
-            hsvImg[1] = combined2;
-            hsvImg[2] = combined3;
-
-            Image<Gray, Byte> combined = combined1 + combined2 + combined3;
+            Image<Gray, Byte> combined = bFilter1.And(gFilter1).And(rFilter1).SmoothMedian(3);                   //.And(bFilter2).And(gFilter2)
+            //Image<Gray, Byte>[] hsvImg = new Image<Gray,Byte>[3];
+            //hsvImg[0] = combined;
             Image<Bgr, Byte> canny_img = combined.Convert<Bgr, Byte>();
 
-            dispString("Image Size = " + Convert.ToString(combined1.Width) + " x " + Convert.ToString(combined1.Height), label7);
-            //dispString("# of pixels = " + pixel_counter((Image<Bgr, Byte>())combined).ToString(), label2);
+            dispString("Image Size = " + Convert.ToString(combined.Width) + " x " + Convert.ToString(combined.Height), label7);
             imageBox3.Image = combined.Resize(imageBox1.Width, imageBox1.Height, Emgu.CV.CvEnum.INTER.CV_INTER_LINEAR);
 
             //Image<Gray, Byte> cannyHsv = combined1.Canny(0, 255);
             Image<Bgr, Byte> comb_color = img.CopyBlank();
 
-            //*********************************************************************************
-            //****************************Tile Shape Detection*********************************
-            //*********************************************************************************
+//***********************************************************************************************
+//******************************************Tile Shape Detection*********************************
+//***********************************************************************************************
 
             List<Triangle2DF> triangleList = new List<Triangle2DF>();
             List<MCvBox2D> boxList = new List<MCvBox2D>();
@@ -261,13 +235,13 @@ namespace pick_place_robot_GUI
                 dispString("length =  " + rect_radial_line_length.ToString(), label23);
             }
 
-            //*********************************************************************************
-            //****************************HSV Shape Detection**********************************
-            //*********************************************************************************
+//***********************************************************************************************************
+//************************************HSV Shape Detection****************************************************
+//***********************************************************************************************************
 
                 List<MCvBox2D> boxList1 = new List<MCvBox2D>();
                 using (MemStorage storage = new MemStorage()) //allocate storage for contour approximation
-                    for (Contour<Point> contours = hsvImg[0].FindContours(); contours != null; contours = contours.HNext)
+                    for (Contour<Point> contours = combined.FindContours(); contours != null; contours = contours.HNext)
                     {   // a contour: list of pixels that can represent a curve
                         Contour<Point> currentPolygon = contours.ApproxPoly(contours.Perimeter * 0.05, storage); // adjust here
                         if (contours.Area > 20 && contours.Area < 200)//only consider contours with area greater than 250
@@ -277,6 +251,7 @@ namespace pick_place_robot_GUI
                                 //bool isTriangle = true;
                                 Point[] pts = currentPolygon.ToArray();
                                 LineSegment2D[] edges = PointCollection.PolyLine(pts, true);
+                                
                                 triangleList.Add(new Triangle2DF(pts[0], pts[1], pts[2]));
                             }
                             if (currentPolygon.Total == 4) //The contour has 4 vertices.
@@ -302,7 +277,6 @@ namespace pick_place_robot_GUI
                         }
                     }
 
-                //combined = combined.Convert<Bgr, Byte>();
                 foreach (Triangle2DF triangle in triangleList)
                 {
                     //LineSegment2DF tri_radial_line = new LineSegment2DF(origin, triangleList[0].Centeroid);
@@ -322,32 +296,40 @@ namespace pick_place_robot_GUI
                     dispString("length =  " + tri_radial_line_length.ToString(), label15);
                 }
                 foreach (MCvBox2D box in boxList1)
-                {
-                    comb_color.Draw(box, new Bgr(Color.Blue), 1);
-                }
-                if (boxList1.Count > 1)
+                {comb_color.Draw(box, new Bgr(Color.Blue), 1);}
+                //if (boxList1.Count >1)
+                //{
+                //    LineSegment2DF radial_line = new LineSegment2DF(boxList1[0].center, boxList1[1].center);
+                //    LineSegment2DF tri_radial_line = new LineSegment2DF(origin, boxList1[0].center);
+                //    comb_color.Draw(radial_line, new Bgr(Color.Silver), 5);
+                //    comb_color.Draw(tri_radial_line, new Bgr(Color.Silver), 5);
+                //}
+                ///*
+                if (boxList1.Count == 2)
                 {
                     LineSegment2DF radial_line = new LineSegment2DF(boxList1[0].center, boxList1[1].center);
                     LineSegment2DF tri_radial_line = new LineSegment2DF(origin, boxList1[0].center);
                     comb_color.Draw(radial_line, new Bgr(Color.Silver), 5);
                     comb_color.Draw(tri_radial_line, new Bgr(Color.Silver), 5);
+                }   
+                
+                 //*/
 
 
-                }
-                   
-                    
 
-                    //double _angle = Math.Atan2(boxList1[0].center.Y - 162, boxList1[0].center.X - 137);
-                    //blue_rect_angle = (int)Math.Abs(_angle * (180 / Math.PI));
-                    //blue_rect_radial_line_length = (int)radial_line.Length;
+                /*
+                //double _angle = Math.Atan2(boxList1[0].center.Y - 162, boxList1[0].center.X - 137);
+                //blue_rect_angle = (int)Math.Abs(_angle * (180 / Math.PI));
+                //blue_rect_radial_line_length = (int)radial_line.Length;
 
-                    //dispString("Rectangle center: " + boxList1[0].center.ToString(), label24);
-                   // dispString("angle =  " + blue_rect_angle.ToString(), label25);
-                    //dispString("length =  " + blue_rect_radial_line_length.ToString(), label26);            
+                //dispString("Rectangle center: " + boxList1[0].center.ToString(), label24);
+                // dispString("angle =  " + blue_rect_angle.ToString(), label25);
+                //dispString("length =  " + blue_rect_radial_line_length.ToString(), label26);            
 
-            //comb_color.Draw(new CircleF(origin, 5), new Bgr(Color.Red), 1);
-            //comb_color.Draw(origin_line, new Bgr(Color.Red), 1);
-            //triangleRectangleImage.Draw(new CircleF(origin, 5), new Bgr(Color.Red), 1);
+                //comb_color.Draw(new CircleF(origin, 5), new Bgr(Color.Red), 1);
+                //comb_color.Draw(origin_line, new Bgr(Color.Red), 1);
+                //triangleRectangleImage.Draw(new CircleF(origin, 5), new Bgr(Color.Red), 1);
+                */
 
             dispString("Image Size = " + Convert.ToString(triangleRectangleImage.Width) + " x " + Convert.ToString(triangleRectangleImage.Height), label3);
             dispString("# of pixels = " + pixel_counter(triangleRectangleImage).ToString(), label4);
@@ -355,8 +337,7 @@ namespace pick_place_robot_GUI
 
             dispString("Image Size = " + Convert.ToString(comb_color.Width) + " x " + Convert.ToString(comb_color.Height), label10);
             dispString("# of pixels = " + pixel_counter(comb_color).ToString(), label11);
-            imageBox4.Image = comb_color;//.Resize(imageBox1.Width, imageBox1.Height, Emgu.CV.CvEnum.INTER.CV_INTER_LINEAR);
-
+            imageBox4.Image = comb_color;           //.Resize(imageBox1.Width, imageBox1.Height, Emgu.CV.CvEnum.INTER.CV_INTER_LINEAR);
         }
 
         public int pixel_counter(Image<Bgr, Byte> image)
@@ -402,7 +383,7 @@ namespace pick_place_robot_GUI
                         this.label20.Text = str;
                     }
                 }       
-
+//*
                 private void button1_Click(object sender, EventArgs e)
                 { serPort.Write("1"); }
 
@@ -426,6 +407,7 @@ namespace pick_place_robot_GUI
 
                 private void button8_Click(object sender, EventArgs e)
                 { serPort.Write("8"); }
+//*/
 
                 private void trackBar6_Scroll(object sender, EventArgs e)
                 {
