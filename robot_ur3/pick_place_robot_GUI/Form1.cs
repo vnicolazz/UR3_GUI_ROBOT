@@ -50,6 +50,8 @@ namespace pick_place_robot_GUI
         SerialPort serPort;
         delegate void displayStringDel(String data);
         string ComPort = "4";    //must check by going into Device Manager, User can now change in GUI
+        bool SerReady;
+        byte[] outByte = new byte[4];
 
 
         public Form1()
@@ -92,6 +94,8 @@ namespace pick_place_robot_GUI
             textBox6.Text = serPort.BaudRate.ToString();
             numericUpDown1.Value = decimal.Parse(ComPort);
             radioButton5.Checked = true;
+
+            SerReady = false;
 
             _capture = new Capture();
             _capture.ImageGrabbed += Display_Captured;	//grab event handler
@@ -364,7 +368,8 @@ namespace pick_place_robot_GUI
                 void serPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
                 {
                     int num = serPort.ReadByte();
-                    displayNumber(num.ToString());
+                    if(num == 1)
+                        SerReady = true;
                 }
 
                 //Serial Communication: displayNumber
@@ -518,7 +523,7 @@ namespace pick_place_robot_GUI
 
                 private void button9_Click(object sender, EventArgs e)
                 {
-                    byte[] outByte = new byte[4];
+                    
                     outByte[0] = (byte)Convert.ToInt32(textBox1.Text);  //joint1
                     outByte[1] = (byte)Convert.ToInt32(textBox2.Text);  //joint2
                     //outByte[2] = (byte)Convert.ToInt32(textBox3.Text);  //joint3
@@ -543,7 +548,18 @@ namespace pick_place_robot_GUI
                         outByte[3] = (byte)Convert.ToInt32(0);
 
                     if(serPort.IsOpen)
-                        serPort.Write(outByte, 0, 4);
+                    {
+                        if(SerReady)
+                        {
+                            serPort.Write(outByte, 0, 4);
+                            SerReady = false;
+                        }
+                        else if(!SerReady)
+                        {
+                            while (!SerReady) { /*Do nothing while Serial Port is not ready*/}
+                            button9.PerformClick();
+                        }
+                    }  
 
                     //label1.Text = Convert.ToString(outByte[0]);
                     //label2.Text = Convert.ToString(outByte[1]);
@@ -589,7 +605,7 @@ namespace pick_place_robot_GUI
 
                 private void button10_Click(object sender, EventArgs e)
                 {
-                    if (button10.Text == "Stop")
+                    if (button10.Text == "Stop")//To stop the communication
                     {
                         button10.Text = "Start";
 
@@ -597,17 +613,17 @@ namespace pick_place_robot_GUI
                         numericUpDown1.Enabled = true;
                         serPort.Close();
                     }
-                    else
+                    else// try to connect serial port
                     {
-                        button10.Text = "Stop";
-                        serPort.BaudRate = int.Parse(textBox6.Text);
-                        serPort.PortName = "COM" + numericUpDown1.Value.ToString();
-
                         try 
                         { 
+                            button10.Text = "Stop";
+                            serPort.BaudRate = int.Parse(textBox6.Text);
+                            serPort.PortName = "COM" + numericUpDown1.Value.ToString();
                             serPort.Open();
                             textBox6.Enabled = false;
-                            numericUpDown1.Enabled = false; 
+                            numericUpDown1.Enabled = false;
+                            SerReady = true;
                         }
                         catch
                         { button10.Text = "Try again"; }
