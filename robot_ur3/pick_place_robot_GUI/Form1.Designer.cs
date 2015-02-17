@@ -95,6 +95,12 @@
             this.trackBar6 = new System.Windows.Forms.TrackBar();
             this.label34 = new System.Windows.Forms.Label();
             this.textBox4 = new System.Windows.Forms.TextBox();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.button10 = new System.Windows.Forms.Button();
+            this.label35 = new System.Windows.Forms.Label();
+            this.label36 = new System.Windows.Forms.Label();
+            this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
+            this.textBox6 = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.imageBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.imageBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.imageBox3)).BeginInit();
@@ -107,6 +113,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.trackBar5)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar4)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar6)).BeginInit();
+            this.groupBox3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             this.SuspendLayout();
             // 
             // imageBox1
@@ -551,7 +559,7 @@
             this.groupBox1.Controls.Add(this.label12);
             this.groupBox1.Controls.Add(this.label13);
             this.groupBox1.Controls.Add(this.label14);
-            this.groupBox1.Location = new System.Drawing.Point(14, 368);
+            this.groupBox1.Location = new System.Drawing.Point(15, 321);
             this.groupBox1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Padding = new System.Windows.Forms.Padding(3, 4, 3, 4);
@@ -603,7 +611,7 @@
             this.groupBox2.Controls.Add(this.textBox1);
             this.groupBox2.Controls.Add(this.trackBar5);
             this.groupBox2.Controls.Add(this.trackBar4);
-            this.groupBox2.Location = new System.Drawing.Point(468, 368);
+            this.groupBox2.Location = new System.Drawing.Point(469, 321);
             this.groupBox2.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Padding = new System.Windows.Forms.Padding(3, 4, 3, 4);
@@ -755,7 +763,7 @@
             // 
             // trackBar6
             // 
-            this.trackBar6.Location = new System.Drawing.Point(853, 408);
+            this.trackBar6.Location = new System.Drawing.Point(853, 370);
             this.trackBar6.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.trackBar6.Maximum = 254;
             this.trackBar6.Name = "trackBar6";
@@ -766,7 +774,7 @@
             // label34
             // 
             this.label34.AutoSize = true;
-            this.label34.Location = new System.Drawing.Point(849, 368);
+            this.label34.Location = new System.Drawing.Point(853, 333);
             this.label34.Name = "label34";
             this.label34.Size = new System.Drawing.Size(83, 20);
             this.label34.TabIndex = 47;
@@ -774,11 +782,68 @@
             // 
             // textBox4
             // 
-            this.textBox4.Location = new System.Drawing.Point(942, 368);
+            this.textBox4.Location = new System.Drawing.Point(942, 330);
             this.textBox4.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.textBox4.Name = "textBox4";
             this.textBox4.Size = new System.Drawing.Size(112, 26);
             this.textBox4.TabIndex = 48;
+            // 
+            // groupBox3
+            // 
+            this.groupBox3.Controls.Add(this.button10);
+            this.groupBox3.Controls.Add(this.label35);
+            this.groupBox3.Controls.Add(this.label36);
+            this.groupBox3.Controls.Add(this.numericUpDown1);
+            this.groupBox3.Controls.Add(this.textBox6);
+            this.groupBox3.Location = new System.Drawing.Point(853, 473);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(281, 118);
+            this.groupBox3.TabIndex = 49;
+            this.groupBox3.TabStop = false;
+            this.groupBox3.Text = "Serial Port";
+            // 
+            // button10
+            // 
+            this.button10.Location = new System.Drawing.Point(28, 49);
+            this.button10.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.button10.Name = "button10";
+            this.button10.Size = new System.Drawing.Size(84, 29);
+            this.button10.TabIndex = 15;
+            this.button10.Text = "Start";
+            this.button10.UseVisualStyleBackColor = true;
+            this.button10.Click += new System.EventHandler(this.button10_Click);
+            // 
+            // label35
+            // 
+            this.label35.AutoSize = true;
+            this.label35.Location = new System.Drawing.Point(165, 15);
+            this.label35.Name = "label35";
+            this.label35.Size = new System.Drawing.Size(86, 20);
+            this.label35.TabIndex = 5;
+            this.label35.Text = "Baud Rate";
+            // 
+            // label36
+            // 
+            this.label36.AutoSize = true;
+            this.label36.Location = new System.Drawing.Point(156, 75);
+            this.label36.Name = "label36";
+            this.label36.Size = new System.Drawing.Size(45, 20);
+            this.label36.TabIndex = 4;
+            this.label36.Text = "COM";
+            // 
+            // numericUpDown1
+            // 
+            this.numericUpDown1.Location = new System.Drawing.Point(201, 73);
+            this.numericUpDown1.Name = "numericUpDown1";
+            this.numericUpDown1.Size = new System.Drawing.Size(53, 26);
+            this.numericUpDown1.TabIndex = 3;
+            // 
+            // textBox6
+            // 
+            this.textBox6.Location = new System.Drawing.Point(160, 38);
+            this.textBox6.Name = "textBox6";
+            this.textBox6.Size = new System.Drawing.Size(94, 26);
+            this.textBox6.TabIndex = 1;
             // 
             // Form1
             // 
@@ -786,6 +851,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1452, 814);
+            this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.textBox4);
             this.Controls.Add(this.label34);
             this.Controls.Add(this.trackBar6);
@@ -845,6 +911,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.trackBar5)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar4)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar6)).EndInit();
+            this.groupBox3.ResumeLayout(false);
+            this.groupBox3.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -918,6 +987,12 @@
         private System.Windows.Forms.TextBox textBox4;
         private System.Windows.Forms.Button button9;
         private System.Windows.Forms.CheckBox checkBox1;
+        private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.Button button10;
+        private System.Windows.Forms.Label label35;
+        private System.Windows.Forms.Label label36;
+        private System.Windows.Forms.NumericUpDown numericUpDown1;
+        private System.Windows.Forms.TextBox textBox6;
     }
 }
 

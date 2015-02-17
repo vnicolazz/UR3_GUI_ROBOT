@@ -52,7 +52,7 @@ namespace pick_place_robot_GUI
         State s = State.disabled;
         SerialPort serPort;
         delegate void displayStringDel(String data);
-        string ComPort = "COM4";    //must check by going into Device Manager
+        string ComPort = "4";    //must check by going into Device Manager
 
         public Form1()
         {
@@ -71,14 +71,14 @@ namespace pick_place_robot_GUI
 
             try
             {
-                serPort = new SerialPort(ComPort);
+                serPort = new SerialPort();
                 serPort.BaudRate = 9600;
                 serPort.DataBits = 8;
                 serPort.Parity = Parity.None;
                 serPort.StopBits = StopBits.One;
-                serPort.Open();
+                //serPort.Open();
                 serPort.DataReceived += new SerialDataReceivedEventHandler(serPort_DataReceived);
-                label17.Text = ComPort;
+                //label17.Text = ComPort;
             }
             catch { }   //NATHAN: DIDNT YOU ADD SOMETHING HERE?
 
@@ -92,7 +92,9 @@ namespace pick_place_robot_GUI
             trackBar4.Value = 70;
             trackBar5.Value = 40;
             textBox1.Text = trackBar4.Value.ToString();
-            textBox2.Text = trackBar5.Value.ToString(); ;
+            textBox2.Text = trackBar5.Value.ToString();
+            textBox6.Text = serPort.BaudRate.ToString();
+            numericUpDown1.Value = decimal.Parse(ComPort);
             radioButton5.Checked = true;
 
             _capture = new Capture();
@@ -544,7 +546,8 @@ namespace pick_place_robot_GUI
                     else
                         outByte[3] = (byte)Convert.ToInt32(0);
 
-                    serPort.Write(outByte, 0, 4);
+                    if(serPort.IsOpen)
+                        serPort.Write(outByte, 0, 4);
                     //label1.Text = Convert.ToString(outByte[0]);
                     //label2.Text = Convert.ToString(outByte[1]);
                     //label3.Text = Convert.ToString(outByte[2]);
@@ -585,6 +588,32 @@ namespace pick_place_robot_GUI
                 private void checkBox1_CheckedChanged(object sender, EventArgs e)
                 {
                     button9.PerformClick();
+                }
+
+                private void button10_Click(object sender, EventArgs e)
+                {
+                    if (button10.Text == "Start")
+                    {
+                        button10.Text = "Stop";
+                        serPort.BaudRate = int.Parse(textBox6.Text);
+                        serPort.PortName = "COM" + numericUpDown1.Value.ToString();
+                        //serPort.Open();
+
+                        textBox6.Enabled = false;
+                        numericUpDown1.Enabled = false;
+                    }
+                    else
+                    {
+                        button10.Text = "Start";
+
+                        textBox6.Enabled = true;
+                        numericUpDown1.Enabled = true;
+                        //serPort.Close();
+                        
+                    }
+
+
+
                 }
        
 
