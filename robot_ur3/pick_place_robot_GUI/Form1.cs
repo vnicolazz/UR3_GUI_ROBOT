@@ -6,12 +6,9 @@ TO DO:
       * maybe by saving previous shape location and drawing previous
  * clean up unused functions
 Note: 
- * line 55: check ComPort
- * line 75: check Baud rate
  * line 83: Nathan added something here to show exceptions but did not upload to GitHub
  * line 98: Capture() (internal cam) or Capture(1) (external cam) used to rid errors
- * line 549: has been commented to run without arduino attached (was giving errors)
- * to show line numbers: "TOOLS"-->"Options"-->"Text Editor"-->"C#"-->"General"-->"Settings"
+ * to show line numbers: "TOOLS"-->"Options"-->"Text Editor"-->"C#"-->"General"-->"Line Numbers"
 Resources:
  * http://colorizer.org/
 */
@@ -52,7 +49,8 @@ namespace pick_place_robot_GUI
         State s = State.disabled;
         SerialPort serPort;
         delegate void displayStringDel(String data);
-        string ComPort = "4";    //must check by going into Device Manager
+        string ComPort = "4";    //must check by going into Device Manager, User can now change in GUI
+
 
         public Form1()
         {
@@ -76,9 +74,7 @@ namespace pick_place_robot_GUI
                 serPort.DataBits = 8;
                 serPort.Parity = Parity.None;
                 serPort.StopBits = StopBits.One;
-                //serPort.Open();
                 serPort.DataReceived += new SerialDataReceivedEventHandler(serPort_DataReceived);
-                //label17.Text = ComPort;
             }
             catch { }   //NATHAN: DIDNT YOU ADD SOMETHING HERE?
 
@@ -548,6 +544,7 @@ namespace pick_place_robot_GUI
 
                     if(serPort.IsOpen)
                         serPort.Write(outByte, 0, 4);
+
                     //label1.Text = Convert.ToString(outByte[0]);
                     //label2.Text = Convert.ToString(outByte[1]);
                     //label3.Text = Convert.ToString(outByte[2]);
@@ -592,27 +589,31 @@ namespace pick_place_robot_GUI
 
                 private void button10_Click(object sender, EventArgs e)
                 {
-                    if (button10.Text == "Start")
-                    {
-                        button10.Text = "Stop";
-                        serPort.BaudRate = int.Parse(textBox6.Text);
-                        serPort.PortName = "COM" + numericUpDown1.Value.ToString();
-                        //serPort.Open();
-
-                        textBox6.Enabled = false;
-                        numericUpDown1.Enabled = false;
-                    }
-                    else
+                    if (button10.Text == "Stop")
                     {
                         button10.Text = "Start";
 
                         textBox6.Enabled = true;
                         numericUpDown1.Enabled = true;
-                        //serPort.Close();
+                        serPort.Close();
+                    }
+                    else
+                    {
+                        button10.Text = "Stop";
+                        serPort.BaudRate = int.Parse(textBox6.Text);
+                        serPort.PortName = "COM" + numericUpDown1.Value.ToString();
+
+                        try 
+                        { 
+                            serPort.Open();
+                            textBox6.Enabled = false;
+                            numericUpDown1.Enabled = false; 
+                        }
+                        catch
+                        { button10.Text = "Try again"; }
+
                         
                     }
-
-
 
                 }
        
