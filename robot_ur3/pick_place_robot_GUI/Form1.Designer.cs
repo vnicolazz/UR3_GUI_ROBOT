@@ -797,19 +797,19 @@
             this.groupBox3.Controls.Add(this.label36);
             this.groupBox3.Controls.Add(this.numericUpDown1);
             this.groupBox3.Controls.Add(this.textBox6);
-            this.groupBox3.Location = new System.Drawing.Point(853, 473);
+            this.groupBox3.Location = new System.Drawing.Point(15, 616);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(281, 118);
+            this.groupBox3.Size = new System.Drawing.Size(448, 118);
             this.groupBox3.TabIndex = 49;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Serial Port";
             // 
             // button10
             // 
-            this.button10.Location = new System.Drawing.Point(28, 49);
+            this.button10.Location = new System.Drawing.Point(12, 49);
             this.button10.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.button10.Name = "button10";
-            this.button10.Size = new System.Drawing.Size(84, 29);
+            this.button10.Size = new System.Drawing.Size(171, 35);
             this.button10.TabIndex = 15;
             this.button10.Text = "Start";
             this.button10.UseVisualStyleBackColor = true;
@@ -818,7 +818,7 @@
             // label35
             // 
             this.label35.AutoSize = true;
-            this.label35.Location = new System.Drawing.Point(165, 15);
+            this.label35.Location = new System.Drawing.Point(291, 26);
             this.label35.Name = "label35";
             this.label35.Size = new System.Drawing.Size(86, 20);
             this.label35.TabIndex = 5;
@@ -827,7 +827,7 @@
             // label36
             // 
             this.label36.AutoSize = true;
-            this.label36.Location = new System.Drawing.Point(156, 75);
+            this.label36.Location = new System.Drawing.Point(282, 86);
             this.label36.Name = "label36";
             this.label36.Size = new System.Drawing.Size(45, 20);
             this.label36.TabIndex = 4;
@@ -835,14 +835,14 @@
             // 
             // numericUpDown1
             // 
-            this.numericUpDown1.Location = new System.Drawing.Point(201, 73);
+            this.numericUpDown1.Location = new System.Drawing.Point(327, 84);
             this.numericUpDown1.Name = "numericUpDown1";
             this.numericUpDown1.Size = new System.Drawing.Size(53, 26);
             this.numericUpDown1.TabIndex = 3;
             // 
             // textBox6
             // 
-            this.textBox6.Location = new System.Drawing.Point(160, 38);
+            this.textBox6.Location = new System.Drawing.Point(286, 49);
             this.textBox6.Name = "textBox6";
             this.textBox6.Size = new System.Drawing.Size(94, 26);
             this.textBox6.TabIndex = 1;
@@ -852,7 +852,7 @@
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1452, 814);
+            this.ClientSize = new System.Drawing.Size(1484, 751);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.textBox4);
             this.Controls.Add(this.label34);
@@ -897,6 +897,7 @@
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.MaximumSize = new System.Drawing.Size(11246, 12484);
             this.Name = "Form1";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.imageBox1)).EndInit();
