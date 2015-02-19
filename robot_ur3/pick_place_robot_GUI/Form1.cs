@@ -51,6 +51,7 @@ namespace pick_place_robot_GUI
         delegate void displayStringDel(String data);
         string ComPort = "4";    //must check by going into Device Manager, User can now change in GUI
         bool SerReady;
+        int Ser_Alternate;
         byte[] outByte = new byte[4];
 
 
@@ -96,6 +97,7 @@ namespace pick_place_robot_GUI
             radioButton5.Checked = true;
 
             SerReady = false;
+            Ser_Alternate = 0;
 
             _capture = new Capture();
             _capture.ImageGrabbed += Display_Captured;	//grab event handler
@@ -370,6 +372,12 @@ namespace pick_place_robot_GUI
                     int num = serPort.ReadByte();
                     if(num == 1)
                         SerReady = true;
+
+                    if ((Ser_Alternate % 2) == 0)//alternate between two button clicks
+                    {
+                        serPort.Write(outByte, 0, outByte.Length);
+                        Ser_Alternate++;
+                    }
                 }
 
                 //Serial Communication: displayNumber
@@ -386,31 +394,6 @@ namespace pick_place_robot_GUI
                         this.label20.Text = str;
                     }
                 }       
-//*
-                private void button1_Click(object sender, EventArgs e)
-                { serPort.Write("1"); }
-
-                private void button2_Click(object sender, EventArgs e)
-                {serPort.Write("2");                }
-
-                private void button3_Click(object sender, EventArgs e)
-                {serPort.Write("3");}
-
-                private void button4_Click(object sender, EventArgs e)
-                {serPort.Write("4");                }
-
-                private void button5_Click(object sender, EventArgs e)
-                {serPort.Write("5");                }
-
-                private void button6_Click(object sender, EventArgs e)
-                {serPort.Write("6");                }
-
-                private void button7_Click(object sender, EventArgs e)
-                {serPort.Write("7");                }
-
-                private void button8_Click(object sender, EventArgs e)
-                { serPort.Write("8"); }
-//*/
 
                 private void trackBar6_Scroll(object sender, EventArgs e)
                 {
@@ -556,8 +539,15 @@ namespace pick_place_robot_GUI
                         }
                         else if(!SerReady)
                         {
-                            while (!SerReady) { /*Do nothing while Serial Port is not ready*/}
-                            button9.PerformClick();
+                            //while (!SerReady) { /*Do nothing while Serial Port is not ready*/}
+                            if ((Ser_Alternate % 2) == 1)//alternate between two button clicks
+                            {
+                                serPort.Write(outByte, 0, outByte.Length);
+                                Ser_Alternate++;
+                            }
+
+                            if (Ser_Alternate == 4)
+                                Ser_Alternate = 0;
                         }
                     }  
 
