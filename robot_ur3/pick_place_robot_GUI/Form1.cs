@@ -54,13 +54,26 @@ namespace pick_place_robot_GUI
         int Ser_Alternate;
         byte[] outByte = new byte[4];
 
+        PointF eb_center = new PointF(5, 5);
+        SizeF eb_size = new SizeF(10, 10);
+        PointF mb_center = new PointF(5, 5);
+        SizeF mb_size = new SizeF(10, 10);
+        PointF t_p1 = new PointF(5, 4);
+        PointF t_p2 = new PointF(4, 6);
+        PointF t_p3 = new PointF(6, 6);
+        
+
+        int firstCatch = 0;
+
+        
+
 
         public Form1()
         {
             //blue
             joint1.hue = 83;
             joint1.saturation = 152;
-            joint1.value = 212;
+            joint1.value = 255;
             //red
             joint2.hue = 255;
             joint2.saturation = 255;
@@ -69,6 +82,7 @@ namespace pick_place_robot_GUI
             joint3.hue = 255;               //120
             joint3.saturation = 255;        //70    
             joint3.value = 255;             //50
+
 
             try
             {
@@ -94,7 +108,7 @@ namespace pick_place_robot_GUI
             textBox2.Text = trackBar5.Value.ToString();
             textBox6.Text = serPort.BaudRate.ToString();
             numericUpDown1.Value = decimal.Parse(ComPort);
-            radioButton5.Checked = true;
+            radioButton5.Checked = true;           
 
             SerReady = false;
             Ser_Alternate = 0;
@@ -106,7 +120,17 @@ namespace pick_place_robot_GUI
 
         void Display_Captured(object sender, EventArgs e)
         {
-            
+             MCvBox2D endBox = new MCvBox2D(eb_center, eb_size, 90);
+             MCvBox2D midBox = new MCvBox2D(mb_center, mb_size, 90);
+             Triangle2DF baseTri = new Triangle2DF(t_p1, t_p2, t_p3);
+
+             //if (firstCatch == 0)
+             //{
+             //    eb_center = new PointF(5, 5);
+             //    mb_center = new PointF(5, 5);
+             //    firstCatch = 1;
+             //}
+
             int tri_angle = 0;
             int rect_angle = 0;
             int blue_rect_angle = 0;
@@ -234,9 +258,9 @@ namespace pick_place_robot_GUI
                 rect_angle = (int)Math.Abs(_angle * (180 / Math.PI));
                 //rect_radial_line_length = (int)rect_radial_line.Length;
 
-                dispString("Rectangle center: " + boxList[0].center.ToString(), label5);
-                dispString("angle =  " + rect_angle.ToString(), label22);
-                dispString("length =  " + rect_radial_line_length.ToString(), label23);
+                dispString("box center: " + boxList[0].center.ToString(), label5);
+                dispString("box angle =  " + boxList[0].angle.ToString(), label22);
+                dispString("box size =  " + boxList[0].size.ToString(), label23);
             }
 
 //***********************************************************************************************************
@@ -248,7 +272,7 @@ namespace pick_place_robot_GUI
                     for (Contour<Point> contours = combined.FindContours(); contours != null; contours = contours.HNext)
                     {   // a contour: list of pixels that can represent a curve
                         Contour<Point> currentPolygon = contours.ApproxPoly(contours.Perimeter * 0.05, storage); // adjust here
-                        if (contours.Area > 20 && contours.Area < 200)//only consider contours with area greater than 250
+                        if (contours.Area > 20 && contours.Area < 900)//only consider contours with area greater than 250
                         {
                             if (currentPolygon.Total == 3) //The contour has 3 vertices, it is a triangle
                             {
@@ -269,7 +293,7 @@ namespace pick_place_robot_GUI
                                     double angle = Math.Abs(edges[(i + 1) % edges.Length].GetExteriorAngleDegree(edges[i]));
 
                                     // determine if all the angles in the contour are within the range of [80, 100], close to 90 degrees 
-                                    if (angle < 70 || angle > 110)
+                                    if (angle < 60 || angle > 120)
                                     {
                                         isRectangle = false;
                                         break;
@@ -280,60 +304,49 @@ namespace pick_place_robot_GUI
                             }
                         }
                     }
-
                 foreach (Triangle2DF triangle in triangleList)
                 {
-                    //LineSegment2DF tri_radial_line = new LineSegment2DF(origin, triangleList[0].Centeroid);
-                    //triangleRectangleImage.Draw(tri_radial_line, new Bgr(Color.Yellow), 2);
-                    // triangleRectangleImage.Draw(triangle, new Bgr(Color.Yellow), 2);
+                    if(triangleList.Count ==1)
+                    {
+                        origin = new PointF(triangleList[0].Centeroid.X, triangleList[0].Centeroid.Y);
+                        //comb_color.Draw(tri_radial_line, new Bgr(Color.Yellow), 1);
+                        comb_color.Draw(triangle, new Bgr(Color.Blue), 1);
 
-                    origin = new PointF(triangleList[0].Centeroid.X, triangleList[0].Centeroid.Y);
-                    //comb_color.Draw(tri_radial_line, new Bgr(Color.Yellow), 1);
-                    comb_color.Draw(triangle, new Bgr(Color.Blue), 1);
+                        t_p1 = triangle.V0;
+                        t_p2 = triangle.V1;
+                        t_p3 = triangle.V2;
 
-                    //double _angle = Math.Atan2(triangleList[0].Centeroid.Y - 162, triangleList[0].Centeroid.X - 137);
-                    //tri_angle = (int)Math.Abs(_angle * (180 / Math.PI));
-                    //tri_radial_line_length = (int)tri_radial_line.Length;
+                        comb_color.Draw(baseTri, new Bgr(Color.AliceBlue), 2);
 
-                    dispString("Triangle centroid: " + triangleList[0].Centeroid.ToString(), label6);
-                    //dispString("angle =  " + tri_angle.ToString(), label14);
-                    dispString("length =  " + tri_radial_line_length.ToString(), label15);
+                        dispString("Triangle centroid: " + triangleList[0].Centeroid.ToString(), label6);
+                        //dispString("angle =  " + tri_angle.ToString(), label14);
+                        dispString("length =  " + tri_radial_line_length.ToString(), label15);
+                    }
                 }
                 foreach (MCvBox2D box in boxList1)
-                {comb_color.Draw(box, new Bgr(Color.Blue), 1);}
-                //if (boxList1.Count >1)
-                //{
-                //    LineSegment2DF radial_line = new LineSegment2DF(boxList1[0].center, boxList1[1].center);
-                //    LineSegment2DF tri_radial_line = new LineSegment2DF(origin, boxList1[0].center);
-                //    comb_color.Draw(radial_line, new Bgr(Color.Silver), 5);
-                //    comb_color.Draw(tri_radial_line, new Bgr(Color.Silver), 5);
-                //}
-                ///*
+                {
+                    if (boxList1.Count == 2)
+                    {
+                       
+                        mb_center = boxList1[0].center;
+                        eb_center = boxList1[1].center;
+                    }
+                    comb_color.Draw(box, new Bgr(Color.Blue), 1);
+                }
+              
                 if (boxList1.Count == 2)
                 {
-                    LineSegment2DF radial_line = new LineSegment2DF(boxList1[0].center, boxList1[1].center);
-                    LineSegment2DF tri_radial_line = new LineSegment2DF(origin, boxList1[0].center);
-                    comb_color.Draw(radial_line, new Bgr(Color.Silver), 5);
-                    comb_color.Draw(tri_radial_line, new Bgr(Color.Silver), 5);
+                    LineSegment2DF radial_line = new LineSegment2DF(midBox.center, endBox.center);
+                    LineSegment2DF tri_radial_line = new LineSegment2DF(baseTri.Centeroid, midBox.center);
+                    comb_color.Draw(radial_line, new Bgr(Color.Silver), 2);
+                    comb_color.Draw(tri_radial_line, new Bgr(Color.Silver), 2);
                 }   
                 
                  //*/
 
+                comb_color.Draw(endBox, new Bgr(Color.Green), 2);
+                comb_color.Draw(midBox, new Bgr(Color.Brown), 2);
 
-
-                /*
-                //double _angle = Math.Atan2(boxList1[0].center.Y - 162, boxList1[0].center.X - 137);
-                //blue_rect_angle = (int)Math.Abs(_angle * (180 / Math.PI));
-                //blue_rect_radial_line_length = (int)radial_line.Length;
-
-                //dispString("Rectangle center: " + boxList1[0].center.ToString(), label24);
-                // dispString("angle =  " + blue_rect_angle.ToString(), label25);
-                //dispString("length =  " + blue_rect_radial_line_length.ToString(), label26);            
-
-                //comb_color.Draw(new CircleF(origin, 5), new Bgr(Color.Red), 1);
-                //comb_color.Draw(origin_line, new Bgr(Color.Red), 1);
-                //triangleRectangleImage.Draw(new CircleF(origin, 5), new Bgr(Color.Red), 1);
-                */
 
             dispString("Image Size = " + Convert.ToString(triangleRectangleImage.Width) + " x " + Convert.ToString(triangleRectangleImage.Height), label3);
             dispString("# of pixels = " + pixel_counter(triangleRectangleImage).ToString(), label4);
