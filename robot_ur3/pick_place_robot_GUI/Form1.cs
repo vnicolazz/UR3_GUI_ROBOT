@@ -323,29 +323,56 @@ namespace pick_place_robot_GUI
                         dispString("length =  " + tri_radial_line_length.ToString(), label15);
                     }
                 }
-                foreach (MCvBox2D box in boxList1)
-                {
-                    if (boxList1.Count == 2)
-                    {
-                       
-                        mb_center = boxList1[0].center;
-                        eb_center = boxList1[1].center;
-                    }
-                    comb_color.Draw(box, new Bgr(Color.Blue), 1);
-                }
-              
+
                 if (boxList1.Count == 2)
-                {
+                { 
+                    mb_center = boxList1[0].center;
+                    eb_center = boxList1[1].center;
+
                     LineSegment2DF radial_line = new LineSegment2DF(midBox.center, endBox.center);
                     LineSegment2DF tri_radial_line = new LineSegment2DF(baseTri.Centeroid, midBox.center);
+                    MCvBox2D temp;
+
+                    double X_distance, Y_distance, distance;
+                    distance = 0;
+
+                    if(tri_radial_line.Length > 110 || tri_radial_line.Length < 90)
+                        if (endBox.center.X < midBox.center.X)//this shouldn't be the case
+                        {
+                            //So we swap the boxes
+                            temp = midBox;
+                            midBox = endBox;
+                            endBox = temp;
+
+
+                            radial_line = new LineSegment2DF(midBox.center, endBox.center);
+                            tri_radial_line = new LineSegment2DF(baseTri.Centeroid, midBox.center);
+                       
+                        }
+
+                    //foreach(MCvBox2D box in boxList1)
+                    //{
+                    //    X_distance = box.center.X - baseTri.Centeroid.X;
+                    //    Y_distance = box.center.Y - baseTri.Centeroid.Y;
+                    //    distance = Math.Sqrt(X_distance * X_distance + Y_distance * Y_distance);   
+                    //}
+
+                    //Draw Lines
+                    foreach (MCvBox2D box in boxList1)
+                    {
+                        comb_color.Draw(box, new Bgr(Color.Blue), 1);
+                    }
                     comb_color.Draw(radial_line, new Bgr(Color.Silver), 2);
                     comb_color.Draw(tri_radial_line, new Bgr(Color.Silver), 2);
+                    comb_color.Draw(endBox, new Bgr(Color.Green), 2);
+                    comb_color.Draw(midBox, new Bgr(Color.Brown), 2);
+
+                    dispString(midBox.center.X.ToString(), label9);
+                    dispString(endBox.center.X.ToString(), label18);
                 }   
                 
-                 //*/
-
-                comb_color.Draw(endBox, new Bgr(Color.Green), 2);
-                comb_color.Draw(midBox, new Bgr(Color.Brown), 2);
+                
+                
 
 
             dispString("Image Size = " + Convert.ToString(triangleRectangleImage.Width) + " x " + Convert.ToString(triangleRectangleImage.Height), label3);
@@ -366,7 +393,7 @@ namespace pick_place_robot_GUI
             return pixel_count;
         }
 
-        public void dispString(string s, Label label)
+        public void dispString(String s, Label label)
         {
             if (InvokeRequired)
             {
