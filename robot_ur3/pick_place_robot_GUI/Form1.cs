@@ -192,14 +192,14 @@ namespace pick_place_robot_GUI
             //List<Triangle2DF> triangleList = new List<Triangle2DF>();
             //List<MCvBox2D> boxList = new List<MCvBox2D>();
 
-            Triangle2DF triTile;// = new Triangle2DF();
+            Triangle2DF triTile = new Triangle2DF();
             MCvBox2D boxTile = new MCvBox2D();
             using (MemStorage storage = new MemStorage()) //allocate storage for contour approximation
                 for (Contour<Point> contours = cannyEdges.FindContours(); contours != null; contours = contours.HNext)
                 {   // a contour: list of pixels that can represent a curve
                     Contour<Point> currentPolygon = contours.ApproxPoly(contours.Perimeter * 0.05, storage); // adjust here
 
-                    if (contours.Area > 100 && contours.Area < 500) //only consider contours with area greater than 250
+                    if (contours.Area > 50 && contours.Area < 200) //only consider contours with area greater than 250
                     {
                         if (currentPolygon.Total == 3) //The contour has 3 vertices, it is a triangle
                         {
@@ -237,10 +237,12 @@ namespace pick_place_robot_GUI
             Image<Bgr, Byte> triangleRectangleImage = img.CopyBlank();
             //triangleRectangleImage.Resize(imageBox5.Width, imageBox5.Height, Emgu.CV.CvEnum.INTER.CV_INTER_LINEAR);
 
-            trig(triTile, boxTile);
-
-
-
+            trig(triTile.Centeroid, boxTile.center);
+                
+            comb_color.Draw(triTile, new Bgr(Color.Yellow), 1);
+            comb_color.Draw(boxTile, new Bgr(Color.Yellow), 1);
+            dispString("Triangle centroid: " + triTile.Centeroid.ToString(), label6);
+            dispString("box center: " + boxTile.center.ToString(), label5);
 
             /*
             //foreach (Triangle2DF triangle in triangleList)
@@ -275,7 +277,7 @@ namespace pick_place_robot_GUI
 //***********************************************************************************************************
 //************************************HSV Shape Detection****************************************************
 //***********************************************************************************************************
-                Triangle2DF hsvTri;      // = new Triangle2DF();
+                //Triangle2DF baseTri;// = new Triangle2DF();      // = new Triangle2DF();
                 List<MCvBox2D> boxList1 = new List<MCvBox2D>();
                 using (MemStorage storage = new MemStorage()) //allocate storage for contour approximation
                     for (Contour<Point> contours = combined.FindContours(); contours != null; contours = contours.HNext)
@@ -290,7 +292,7 @@ namespace pick_place_robot_GUI
                                 LineSegment2D[] edges = PointCollection.PolyLine(pts, true);
                                 
                                 //triangleList.Add(new Triangle2DF(pts[0], pts[1], pts[2]));
-                                hsvTri = new Triangle2DF(pts[0], pts[1], pts[2]);
+                                baseTri = new Triangle2DF(pts[0], pts[1], pts[2]);
                             }
                             if (currentPolygon.Total == 4) //The contour has 4 vertices.
                             {
@@ -335,13 +337,22 @@ namespace pick_place_robot_GUI
                     }
                 }
             */
+
+                //comb_color.Draw(hsvTri, new Bgr(Color.Blue), 1);
+                comb_color.Draw(baseTri, new Bgr(Color.AliceBlue), 2);
+
+
                 if (boxList1.Count == 2)
                 { 
                     mb_center = boxList1[0].center;
                     eb_center = boxList1[1].center;
 
                     LineSegment2DF radial_line = new LineSegment2DF(midBox.center, endBox.center);
+                    //label25
+                    dispString(radial_line.Length.ToString(), label26);
                     LineSegment2DF tri_radial_line = new LineSegment2DF(baseTri.Centeroid, midBox.center);
+                    dispString(tri_radial_line.Length.ToString(), label25);
+                    //label26
                     MCvBox2D temp;
 
                     double X_distance, Y_distance, distance;
@@ -695,7 +706,7 @@ namespace pick_place_robot_GUI
 
 
         //this is where the trig will be done to determine joint angles
-                public void trig(Triangle2DF tri, MCvBox2D box)
+                public void trig(PointF tri, PointF box)
                 {
                     
                 }
