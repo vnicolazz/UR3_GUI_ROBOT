@@ -34,7 +34,7 @@ namespace pick_place_robot_GUI
     public partial class Form1 : Form
     {
         Capture _capture = null;
-        int threshold = 150;
+        int threshold = 211;
         delegate void displayStringDelegate(String s, Label label);
 
         struct HSV_joint
@@ -163,6 +163,7 @@ namespace pick_place_robot_GUI
             blue_hsv = blue_hsv.Resize(imageBox1.Width, imageBox1.Height, Emgu.CV.CvEnum.INTER.CV_INTER_LINEAR);
             img2 = img2.Resize(imageBox1.Width, imageBox1.Height, Emgu.CV.CvEnum.INTER.CV_INTER_LINEAR);
 
+            imageBox2.Image = gray;
            // imageBox3.Image 
             //blue
             Image<Gray, Byte>[] channels1 = blue_hsv.Split();
@@ -195,7 +196,7 @@ namespace pick_place_robot_GUI
                 {   // a contour: list of pixels that can represent a curve
                     Contour<Point> currentPolygon = contours.ApproxPoly(contours.Perimeter * 0.05, storage); // adjust here
 
-                    if (contours.Area > 200 && contours.Area < 800) //only consider contours with area greater than 250
+                    if (contours.Area > 100 && contours.Area < 500) //only consider contours with area greater than 250
                     {
                         if (currentPolygon.Total == 3) //The contour has 3 vertices, it is a triangle
                         {
@@ -204,7 +205,9 @@ namespace pick_place_robot_GUI
                             LineSegment2D[] edges = PointCollection.PolyLine(pts, true);
                             triangleList.Add(new Triangle2DF(pts[0], pts[1], pts[2]));
                         }
-                        else if (currentPolygon.Total == 4) //The contour has 4 vertices.
+                    }
+                    else if(contours.Area > 200 && contours.Area < 800) 
+                        if(currentPolygon.Total == 4) //The contour has 4 vertices.
                         {
                             bool isRectangle = true;
                             Point[] pts = currentPolygon.ToArray();
@@ -224,7 +227,7 @@ namespace pick_place_robot_GUI
                             if (isRectangle)
                                 boxList.Add(currentPolygon.GetMinAreaRect());
                         }
-                    }
+                    
                 }
             Image<Bgr, Byte> triangleRectangleImage = img.CopyBlank();
             //triangleRectangleImage.Resize(imageBox5.Width, imageBox5.Height, Emgu.CV.CvEnum.INTER.CV_INTER_LINEAR);
@@ -336,19 +339,19 @@ namespace pick_place_robot_GUI
                     double X_distance, Y_distance, distance;
                     distance = 0;
 
-                    if(tri_radial_line.Length > 110 || tri_radial_line.Length < 90)
-                        if (endBox.center.X < midBox.center.X)//this shouldn't be the case
-                        {
-                            //So we swap the boxes
-                            temp = midBox;
-                            midBox = endBox;
-                            endBox = temp;
+                    //if(tri_radial_line.Length > 110 || tri_radial_line.Length < 90)
+                    //    if (endBox.center.X < midBox.center.X)//this shouldn't be the case
+                    //    {
+                    //        //So we swap the boxes
+                    //        temp = midBox;
+                    //        midBox = endBox;
+                    //        endBox = temp;
 
 
-                            radial_line = new LineSegment2DF(midBox.center, endBox.center);
-                            tri_radial_line = new LineSegment2DF(baseTri.Centeroid, midBox.center);
+                    //        radial_line = new LineSegment2DF(midBox.center, endBox.center);
+                    //        tri_radial_line = new LineSegment2DF(baseTri.Centeroid, midBox.center);
                        
-                        }
+                    //    }
 
                     //foreach(MCvBox2D box in boxList1)
                     //{
@@ -377,7 +380,7 @@ namespace pick_place_robot_GUI
 
             dispString("Image Size = " + Convert.ToString(triangleRectangleImage.Width) + " x " + Convert.ToString(triangleRectangleImage.Height), label3);
             dispString("# of pixels = " + pixel_counter(triangleRectangleImage).ToString(), label4);
-            imageBox2.Image = triangleRectangleImage.Resize(imageBox1.Width, imageBox1.Height, Emgu.CV.CvEnum.INTER.CV_INTER_LINEAR);
+            //imageBox2.Image = triangleRectangleImage.Resize(imageBox1.Width, imageBox1.Height, Emgu.CV.CvEnum.INTER.CV_INTER_LINEAR);
 
             dispString("Image Size = " + Convert.ToString(comb_color.Width) + " x " + Convert.ToString(comb_color.Height), label10);
             dispString("# of pixels = " + pixel_counter(comb_color).ToString(), label11);
