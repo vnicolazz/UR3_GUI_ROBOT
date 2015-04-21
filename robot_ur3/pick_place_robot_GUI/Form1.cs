@@ -27,11 +27,11 @@ using Emgu.CV;
 using Emgu.CV.Structure;
 using Emgu.CV.CvEnum;
 using Emgu.CV.UI;
-
+using HiEmgu;
 
 namespace pick_place_robot_GUI
 {
-    public partial class Form1 : Form
+    public partial class Form1 : Form        //static was not here originally
     {
         Capture _capture = null;
         int threshold = 211;
@@ -62,11 +62,8 @@ namespace pick_place_robot_GUI
         PointF t_p2 = new PointF(4, 6);
         PointF t_p3 = new PointF(6, 6);
         
-
         int firstCatch = 0;
-
-        
-
+        robot scara = new robot();   
 
         public Form1()
         {
@@ -93,7 +90,7 @@ namespace pick_place_robot_GUI
                 serPort.StopBits = StopBits.One;
                 serPort.DataReceived += new SerialDataReceivedEventHandler(serPort_DataReceived);
             }
-            catch { }   //NATHAN: DIDNT YOU ADD SOMETHING HERE?
+            catch { }
 
             InitializeComponent();
         }
@@ -150,6 +147,8 @@ namespace pick_place_robot_GUI
             //img.Draw(new CircleF(origin, 5), new Bgr(Color.Red), 1);
             imageBox1.Image = img;
 
+            
+
             Image<Gray, Byte> gray = img.Convert<Gray, Byte>().ThresholdBinary(new Gray(threshold), new Gray(255));//.PyrDown().PyrUp();
             Image<Gray, Byte> cannyEdges = gray.Canny(0, 255);
 
@@ -163,7 +162,7 @@ namespace pick_place_robot_GUI
             blue_hsv = blue_hsv.Resize(imageBox1.Width, imageBox1.Height, Emgu.CV.CvEnum.INTER.CV_INTER_LINEAR);
             img2 = img2.Resize(imageBox1.Width, imageBox1.Height, Emgu.CV.CvEnum.INTER.CV_INTER_LINEAR);
 
-            imageBox2.Image = gray;
+            imageBox2.Image = gray;     
            // imageBox3.Image 
             //blue
             Image<Gray, Byte>[] channels1 = blue_hsv.Split();
@@ -188,9 +187,13 @@ namespace pick_place_robot_GUI
 //***********************************************************************************************
 //******************************************Tile Shape Detection*********************************
 //***********************************************************************************************
+            //tile shape detection is being chnaged to handle only one square and one triangle
 
-            List<Triangle2DF> triangleList = new List<Triangle2DF>();
-            List<MCvBox2D> boxList = new List<MCvBox2D>();
+            //List<Triangle2DF> triangleList = new List<Triangle2DF>();
+            //List<MCvBox2D> boxList = new List<MCvBox2D>();
+
+            Triangle2DF triTile;// = new Triangle2DF();
+            MCvBox2D boxTile = new MCvBox2D();
             using (MemStorage storage = new MemStorage()) //allocate storage for contour approximation
                 for (Contour<Point> contours = cannyEdges.FindContours(); contours != null; contours = contours.HNext)
                 {   // a contour: list of pixels that can represent a curve
@@ -203,7 +206,8 @@ namespace pick_place_robot_GUI
                             //bool isTriangle = true;
                             Point[] pts = currentPolygon.ToArray();
                             LineSegment2D[] edges = PointCollection.PolyLine(pts, true);
-                            triangleList.Add(new Triangle2DF(pts[0], pts[1], pts[2]));
+                            //triangleList.Add(new Triangle2DF(pts[0], pts[1], pts[2]));
+                            triTile = new Triangle2DF(pts[0], pts[1], pts[2]);
                         }
                     }
                     else if(contours.Area > 200 && contours.Area < 800) 
@@ -225,51 +229,53 @@ namespace pick_place_robot_GUI
                                 }
                             }
                             if (isRectangle)
-                                boxList.Add(currentPolygon.GetMinAreaRect());
+                                //boxList.Add(currentPolygon.GetMinAreaRect());
+                                boxTile = currentPolygon.GetMinAreaRect();
                         }
                     
                 }
             Image<Bgr, Byte> triangleRectangleImage = img.CopyBlank();
             //triangleRectangleImage.Resize(imageBox5.Width, imageBox5.Height, Emgu.CV.CvEnum.INTER.CV_INTER_LINEAR);
 
-            foreach (Triangle2DF triangle in triangleList)
-            {
-                //LineSegment2DF tri_radial_line = new LineSegment2DF(origin, triangleList[0].Centeroid);
-                //triangleRectangleImage.Draw(tri_radial_line, new Bgr(Color.Yellow), 2);
-               // triangleRectangleImage.Draw(triangle, new Bgr(Color.Yellow), 2);        
+            trig(triTile, boxTile);
 
-                //comb_color.Draw(tri_radial_line, new Bgr(Color.Yellow), 1);
-                comb_color.Draw(triangle, new Bgr(Color.Yellow), 1);
 
-                double _angle = Math.Atan2(triangleList[0].Centeroid.Y-162, triangleList[0].Centeroid.X-137);
-                tri_angle = (int)Math.Abs(_angle * (180 / Math.PI));
-                //tri_radial_line_length = (int)tri_radial_line.Length;
 
-                dispString("Triangle centroid: " + triangleList[0].Centeroid.ToString(), label6);
-                //dispString("angle =  " + tri_angle.ToString(), label14);
-                dispString("length =  " + tri_radial_line_length.ToString(), label15);
-            }
-            foreach (MCvBox2D box in boxList)
-            {
-                //LineSegment2DF rect_radial_line = new LineSegment2DF(origin, boxList[0].center);
-                //triangleRectangleImage.Draw(rect_radial_line, new Bgr(Color.Pink), 2);
-                //triangleRectangleImage.Draw(box, new Bgr(Color.Pink), 2);
-                //comb_color.Draw(rect_radial_line, new Bgr(Color.Pink), 1);
-                comb_color.Draw(box, new Bgr(Color.Pink), 1);
 
-                double _angle = Math.Atan2(boxList[0].center.Y - 162, boxList[0].center.X - 137);
-                rect_angle = (int)Math.Abs(_angle * (180 / Math.PI));
-                //rect_radial_line_length = (int)rect_radial_line.Length;
+            /*
+            //foreach (Triangle2DF triangle in triangleList)
+            //{
+            //    comb_color.Draw(triangle, new Bgr(Color.Yellow), 1);
 
-                dispString("box center: " + boxList[0].center.ToString(), label5);
-                dispString("box angle =  " + boxList[0].angle.ToString(), label22);
-                dispString("box size =  " + boxList[0].size.ToString(), label23);
-            }
+            //    double _angle = Math.Atan2(triangleList[0].Centeroid.Y-162, triangleList[0].Centeroid.X-137);
+            //    tri_angle = (int)Math.Abs(_angle * (180 / Math.PI));
+            //    //tri_radial_line_length = (int)tri_radial_line.Length;
+
+            //    dispString("Triangle centroid: " + triangleList[0].Centeroid.ToString(), label6);
+            //    //dispString("angle =  " + tri_angle.ToString(), label14);
+            //    dispString("length =  " + tri_radial_line_length.ToString(), label15);
+            //}
+
+            //foreach (MCvBox2D box in boxList)
+            //{
+            //    comb_color.Draw(box, new Bgr(Color.Pink), 1);
+
+            //    double _angle = Math.Atan2(boxList[0].center.Y - 162, boxList[0].center.X - 137);
+            //    rect_angle = (int)Math.Abs(_angle * (180 / Math.PI));
+            //    //rect_radial_line_length = (int)rect_radial_line.Length;
+
+            //    dispString("box center: " + boxList[0].center.ToString(), label5);
+            //    dispString("box angle =  " + boxList[0].angle.ToString(), label22);
+            //    dispString("box size =  " + boxList[0].size.ToString(), label23);
+
+            //    //SEND BOX CENTER TO TRIG FUNCTION
+            //}
+            */
 
 //***********************************************************************************************************
 //************************************HSV Shape Detection****************************************************
 //***********************************************************************************************************
-
+                Triangle2DF hsvTri;      // = new Triangle2DF();
                 List<MCvBox2D> boxList1 = new List<MCvBox2D>();
                 using (MemStorage storage = new MemStorage()) //allocate storage for contour approximation
                     for (Contour<Point> contours = combined.FindContours(); contours != null; contours = contours.HNext)
@@ -283,7 +289,8 @@ namespace pick_place_robot_GUI
                                 Point[] pts = currentPolygon.ToArray();
                                 LineSegment2D[] edges = PointCollection.PolyLine(pts, true);
                                 
-                                triangleList.Add(new Triangle2DF(pts[0], pts[1], pts[2]));
+                                //triangleList.Add(new Triangle2DF(pts[0], pts[1], pts[2]));
+                                hsvTri = new Triangle2DF(pts[0], pts[1], pts[2]);
                             }
                             if (currentPolygon.Total == 4) //The contour has 4 vertices.
                             {
@@ -307,7 +314,8 @@ namespace pick_place_robot_GUI
                             }
                         }
                     }
-                foreach (Triangle2DF triangle in triangleList)
+            /*    
+            foreach (Triangle2DF triangle in triangleList)
                 {
                     if(triangleList.Count ==1)
                     {
@@ -326,7 +334,7 @@ namespace pick_place_robot_GUI
                         dispString("length =  " + tri_radial_line_length.ToString(), label15);
                     }
                 }
-
+            */
                 if (boxList1.Count == 2)
                 { 
                     mb_center = boxList1[0].center;
@@ -374,10 +382,6 @@ namespace pick_place_robot_GUI
                     dispString(endBox.center.X.ToString(), label18);
                 }   
                 
-                
-                
-
-
             dispString("Image Size = " + Convert.ToString(triangleRectangleImage.Width) + " x " + Convert.ToString(triangleRectangleImage.Height), label3);
             dispString("# of pixels = " + pixel_counter(triangleRectangleImage).ToString(), label4);
             //imageBox2.Image = triangleRectangleImage.Resize(imageBox1.Width, imageBox1.Height, Emgu.CV.CvEnum.INTER.CV_INTER_LINEAR);
@@ -386,6 +390,54 @@ namespace pick_place_robot_GUI
             dispString("# of pixels = " + pixel_counter(comb_color).ToString(), label11);
             imageBox4.Image = comb_color;           //.Resize(imageBox1.Width, imageBox1.Height, Emgu.CV.CvEnum.INTER.CV_INTER_LINEAR);
         }
+
+        public void updateScara()
+        {
+            outByte[0] = (byte)Convert.ToInt32(textBox1.Text);  //joint1
+            outByte[1] = (byte)Convert.ToInt32(textBox2.Text);  //joint2
+            //outByte[2] = (byte)Convert.ToInt32(textBox3.Text);  //joint3
+
+            if (radioButton4.Checked)    //pick
+            {
+                outByte[2] = (byte)Convert.ToInt32(90);
+            }
+            else if (radioButton5.Checked)    //move
+            {
+                outByte[2] = (byte)Convert.ToInt32(40);
+            }
+            else if (radioButton6.Checked)    //drop
+            {
+                outByte[2] = (byte)Convert.ToInt32(110);
+            }
+
+            //State of Checkbox determines state of magnet
+            if (checkBox1.Checked)
+                outByte[3] = (byte)Convert.ToInt32(1);
+            else
+                outByte[3] = (byte)Convert.ToInt32(0);
+
+            if (serPort.IsOpen)
+            {
+                if (SerReady)
+                {
+                    serPort.Write(outByte, 0, 4);
+                    SerReady = false;
+                }
+                else if (!SerReady)
+                {
+                    //while (!SerReady) { /*Do nothing while Serial Port is not ready*/}
+                    if ((Ser_Alternate % 2) == 1)//alternate between two button clicks
+                    {
+                        serPort.Write(outByte, 0, outByte.Length);
+                        Ser_Alternate++;
+                    }
+
+                    if (Ser_Alternate == 4)
+                        Ser_Alternate = 0;
+                }
+            }
+        }
+                
 
         public int pixel_counter(Image<Bgr, Byte> image)
         {
@@ -547,57 +599,9 @@ namespace pick_place_robot_GUI
                     }
                 }
 
-                private void button9_Click(object sender, EventArgs e)
+                public void button9_Click(object sender, EventArgs e)   //this was originally private
                 {
-                    
-                    outByte[0] = (byte)Convert.ToInt32(textBox1.Text);  //joint1
-                    outByte[1] = (byte)Convert.ToInt32(textBox2.Text);  //joint2
-                    //outByte[2] = (byte)Convert.ToInt32(textBox3.Text);  //joint3
-
-                    if (radioButton4.Checked)    //pick
-                    {
-                        outByte[2] = (byte)Convert.ToInt32(90);
-                    }
-                    else if (radioButton5.Checked)    //move
-                    {
-                        outByte[2] = (byte)Convert.ToInt32(40);
-                    }
-                    else if (radioButton6.Checked)    //drop
-                    {
-                        outByte[2] = (byte)Convert.ToInt32(110);
-                    }
-
-                    //State of Checkbox determines state of magnet
-                    if (checkBox1.Checked)
-                        outByte[3] = (byte)Convert.ToInt32(1);
-                    else
-                        outByte[3] = (byte)Convert.ToInt32(0);
-
-                    if(serPort.IsOpen)
-                    {
-                        if(SerReady)
-                        {
-                            serPort.Write(outByte, 0, 4);
-                            SerReady = false;
-                        }
-                        else if(!SerReady)
-                        {
-                            //while (!SerReady) { /*Do nothing while Serial Port is not ready*/}
-                            if ((Ser_Alternate % 2) == 1)//alternate between two button clicks
-                            {
-                                serPort.Write(outByte, 0, outByte.Length);
-                                Ser_Alternate++;
-                            }
-
-                            if (Ser_Alternate == 4)
-                                Ser_Alternate = 0;
-                        }
-                    }  
-
-                    //label1.Text = Convert.ToString(outByte[0]);
-                    //label2.Text = Convert.ToString(outByte[1]);
-                    //label3.Text = Convert.ToString(outByte[2]);
-                    //label4.Text = Convert.ToString(outByte[3]);
+                    updateScara();
                 }
 
                 private void radioButton4_CheckedChanged(object sender, EventArgs e)
@@ -688,7 +692,13 @@ namespace pick_place_robot_GUI
                     { trackBar4.Value = int.Parse(textBox1.Text); }
 
                 }
-       
 
+
+        //this is where the trig will be done to determine joint angles
+                public void trig(Triangle2DF tri, MCvBox2D box)
+                {
+                    
+                }
+    
     }
 }
