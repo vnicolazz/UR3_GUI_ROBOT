@@ -101,6 +101,7 @@
             this.label36 = new System.Windows.Forms.Label();
             this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
             this.textBox6 = new System.Windows.Forms.TextBox();
+            this.checkBox2 = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.imageBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.imageBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.imageBox3)).BeginInit();
@@ -152,20 +153,20 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(91, 200);
+            this.label1.Location = new System.Drawing.Point(10, 200);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(93, 17);
+            this.label1.Size = new System.Drawing.Size(42, 17);
             this.label1.TabIndex = 3;
-            this.label1.Text = "Image Size = ";
+            this.label1.Text = "blank";
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(91, 217);
+            this.label2.Location = new System.Drawing.Point(10, 217);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(87, 17);
+            this.label2.Size = new System.Drawing.Size(42, 17);
             this.label2.TabIndex = 4;
-            this.label2.Text = "# of pixels = ";
+            this.label2.Text = "blank";
             // 
             // label3
             // 
@@ -188,7 +189,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(758, 486);
+            this.label5.Location = new System.Drawing.Point(994, 490);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(134, 17);
             this.label5.TabIndex = 7;
@@ -197,7 +198,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(759, 514);
+            this.label6.Location = new System.Drawing.Point(995, 514);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(133, 17);
             this.label6.TabIndex = 8;
@@ -206,47 +207,47 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(372, 200);
+            this.label7.Location = new System.Drawing.Point(210, 230);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(93, 17);
+            this.label7.Size = new System.Drawing.Size(208, 17);
             this.label7.TabIndex = 9;
-            this.label7.Text = "Image Size = ";
+            this.label7.Text = "Switch AUTO ON (default OFF):";
             // 
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(372, 217);
+            this.label8.Location = new System.Drawing.Point(1115, 55);
             this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(87, 17);
+            this.label8.Size = new System.Drawing.Size(77, 17);
             this.label8.TabIndex = 10;
-            this.label8.Text = "# of pixels = ";
+            this.label8.Text = "angleB_W ";
             // 
             // label9
             // 
             this.label9.AutoSize = true;
             this.label9.Location = new System.Drawing.Point(1115, 72);
             this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(62, 17);
+            this.label9.Size = new System.Drawing.Size(73, 17);
             this.label9.TabIndex = 11;
-            this.label9.Text = "Origin = ";
+            this.label9.Text = "angleC_W";
             // 
             // label10
             // 
             this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(925, 200);
+            this.label10.Location = new System.Drawing.Point(1116, 89);
             this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(93, 17);
+            this.label10.Size = new System.Drawing.Size(52, 17);
             this.label10.TabIndex = 12;
-            this.label10.Text = "Image Size = ";
+            this.label10.Text = "angleB";
             // 
             // label11
             // 
             this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(925, 217);
+            this.label11.Location = new System.Drawing.Point(1116, 106);
             this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(87, 17);
+            this.label11.Size = new System.Drawing.Size(52, 17);
             this.label11.TabIndex = 13;
-            this.label11.Text = "# of pixels = ";
+            this.label11.Text = "angleC";
             // 
             // label12
             // 
@@ -333,7 +334,7 @@
             // label21
             // 
             this.label21.AutoSize = true;
-            this.label21.Location = new System.Drawing.Point(1116, 217);
+            this.label21.Location = new System.Drawing.Point(1144, 217);
             this.label21.Name = "label21";
             this.label21.Size = new System.Drawing.Size(133, 17);
             this.label21.TabIndex = 24;
@@ -802,12 +803,24 @@
             this.textBox6.Size = new System.Drawing.Size(84, 22);
             this.textBox6.TabIndex = 1;
             // 
+            // checkBox2
+            // 
+            this.checkBox2.AutoSize = true;
+            this.checkBox2.Location = new System.Drawing.Point(430, 230);
+            this.checkBox2.Name = "checkBox2";
+            this.checkBox2.Size = new System.Drawing.Size(94, 21);
+            this.checkBox2.TabIndex = 58;
+            this.checkBox2.Text = "AUTO ON";
+            this.checkBox2.UseVisualStyleBackColor = true;
+            this.checkBox2.CheckedChanged += new System.EventHandler(this.checkBox2_CheckedChanged);
+            // 
             // Form1
             // 
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1319, 601);
+            this.Controls.Add(this.checkBox2);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.textBox4);
             this.Controls.Add(this.label34);
@@ -950,6 +963,7 @@
         private System.Windows.Forms.Label label36;
         private System.Windows.Forms.NumericUpDown numericUpDown1;
         private System.Windows.Forms.TextBox textBox6;
+        private System.Windows.Forms.CheckBox checkBox2;
     }
 }
 

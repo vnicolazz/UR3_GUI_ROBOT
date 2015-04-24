@@ -9,9 +9,9 @@ namespace HiEmgu
 {
     class robot
     {
-        private int joint1;
-        private int joint2;
-        private int endEff;
+        private double joint1;
+        private double joint2;
+        private double endEff;
         private bool magnet;
         enum eeState { pick, move, drop };
         const int pick = 90;
@@ -36,12 +36,12 @@ namespace HiEmgu
         {
             throw new NotImplementedException();
         }
-        public void setJ1(int value)
+        public void setJ1(double value)
         {
             joint1 = value;
             updateBot();
         }
-        public void setJ2(int value)
+        public void setJ2(double value)
         {
             joint2 = value;
             updateBot();
@@ -65,6 +65,12 @@ namespace HiEmgu
             }
             updateBot();
         }
+        public double getJ1()
+        { return joint1; }
+        public double getJ2()
+        { return joint2; }
+        public double getEE()
+        { return endEff; }
     }
 }
 
