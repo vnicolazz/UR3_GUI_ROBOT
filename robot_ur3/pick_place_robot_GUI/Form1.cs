@@ -38,6 +38,8 @@ namespace pick_place_robot_GUI
         int threshold = 211;
         delegate void displayStringDelegate(String s, Label label);
         delegate void displayTextDelegate(String S, TextBox textbox);
+        global_counter count = new global_counter();
+        
 
         struct HSV_joint
         {
@@ -63,7 +65,7 @@ namespace pick_place_robot_GUI
         PointF t_p1 = new PointF(5, 4);
         PointF t_p2 = new PointF(4, 6);
         PointF t_p3 = new PointF(6, 6);
-        bool auto = false;
+        
 
         
 
@@ -100,8 +102,7 @@ namespace pick_place_robot_GUI
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            if (checkBox2.Checked = false)
-                auto = false;
+            
             trackBar6.Value = threshold;
             radioButton1.Checked = true;
             trackBar4.Value = 70;
@@ -230,10 +231,16 @@ namespace pick_place_robot_GUI
                         }
 
                 }
+
+            if(!triTile.Centeroid.IsEmpty)
+            {
+                //tricount++;
+            }
+
             Image<Bgr, Byte> triangleRectangleImage = img.CopyBlank();
             //triangleRectangleImage.Resize(imageBox5.Width, imageBox5.Height, Emgu.CV.CvEnum.INTER.CV_INTER_LINEAR);
 
-
+            
 
             comb_color.Draw(triTile, new Bgr(Color.Yellow), 1);
             comb_color.Draw(boxTile, new Bgr(Color.Yellow), 1);
@@ -283,6 +290,7 @@ namespace pick_place_robot_GUI
                     }
                 }
 
+            
             comb_color.Draw(baseTri, new Bgr(Color.AliceBlue), 2);
 
             if (boxList1.Count == 2)
@@ -320,36 +328,33 @@ namespace pick_place_robot_GUI
             Double D_ang1 = new double();
             Double ang1 = new double();
 
-
-
             if (boxList1.Count == 2)
             {
                 ang1 = (-(Math.Atan2(boxList1[0].center.Y - baseTri.Centeroid.Y, boxList1[0].center.X - baseTri.Centeroid.X)
                         - Math.Atan2(153 - 153, 30 - 25)) * 180 / Math.PI);
 
 
-                if (!baseTri.Centeroid.IsEmpty && !boxList1[0].center.IsEmpty && !boxList1[1].center.IsEmpty)
+                if (!baseTri.Centeroid.IsEmpty && !boxList1[0].center.IsEmpty && !boxList1[1].center.IsEmpty)   //find angle between arms curently
                     arm_angle = arm_trig(baseTri.Centeroid, boxList1[1].center, boxList1[0].center);
-                if(!baseTri.Centeroid.IsEmpty && !boxList1[0].center.IsEmpty && !boxTile.center.IsEmpty)
+                if(!baseTri.Centeroid.IsEmpty && !boxList1[0].center.IsEmpty && !boxTile.center.IsEmpty)        // BOX: find desired arm angle and angle from origin line to desired hyp line
                 {   
                     darm_angle = arm_trig(baseTri.Centeroid, boxList1[1].center, boxTile.center);
                     D_ang1 = (-(Math.Atan2(boxTile.center.Y - baseTri.Centeroid.Y, boxTile.center.X - baseTri.Centeroid.X)
                         - Math.Atan2(153 - 153, 30 - 25)) * 180 / Math.PI);
+                    //if(count.Get() == 0)
+                    //  count.addCnt();
+                    //else if(count.Get() == 2)
+                    updateScara((D_ang1 + darm_angle[0]), darm_angle[1], boxList1[0].center, boxTile.center);
+
                 }
-                else if (!baseTri.Centeroid.IsEmpty && !boxList1[0].center.IsEmpty && !triTile.Centeroid.IsEmpty)
+                else if (!baseTri.Centeroid.IsEmpty && !boxList1[0].center.IsEmpty && !triTile.Centeroid.IsEmpty)//TRI: find desired arm angle and angle from origin line to desired hyp line
                 {
                     darm_angle = arm_trig(baseTri.Centeroid, boxList1[1].center, triTile.Centeroid);
                     D_ang1 = (-(Math.Atan2(triTile.Centeroid.Y - baseTri.Centeroid.Y, triTile.Centeroid.X - baseTri.Centeroid.X)
                         - Math.Atan2(153 - 153, 30 - 25)) * 180 / Math.PI);
                 }
-
-
-                //textBox1.Text = (D_ang1 + darm_angle[0]).ToString();
-                //scara.setJ1((D_ang1 + darm_angle[0]));
-                //scara.setJ2(darm_angle[1]);
-
-                updateScara((D_ang1 + darm_angle[0]), darm_angle[1]);
-
+                // if tile is seen 5 times, save value and move to location
+                //updateScara((D_ang1 + darm_angle[0]), darm_angle[1]);
 
             }
 
@@ -360,21 +365,13 @@ namespace pick_place_robot_GUI
             dispString("Hyp we need " + D_ang1.ToString(), label15);
             dispString("Hyp we have " + ang1.ToString(), label21);
 
-
-
-            if (!triTile.Centeroid.IsEmpty && arm_angle.Average() > 0)
-            {
-
-            };
-
-            
-
             comb_color.Draw(oline, new Bgr(Color.Red), 1);
             imageBox4.Image = comb_color;  
-         
+
+            //END OF CAPTURE
         }
 
-        public void updateScara(double one, double two)
+        public void updateScara(double one, double two, PointF EE, PointF tile)
         {
             if (checkBox2.Checked == false)
             {
@@ -406,10 +403,18 @@ namespace pick_place_robot_GUI
                 //double j1 = scara.getJ1();
                 //double j2 = scara.getJ2();
                 //double EE = scara.getEE();
-
-                outByte[0] = (byte)Convert.ToInt32((int)one);  //joint1
-                outByte[1] = (byte)Convert.ToInt32((int)two);  //joint2
-                //outByte[2] = (byte)Convert.ToInt32((int)EE);  //joint3
+                if(EE != tile)
+                {
+                    outByte[0] = (byte)Convert.ToInt32((int)one);  //joint1
+                    outByte[1] = (byte)Convert.ToInt32((int)two);  //joint2
+                    outByte[2] = (byte)Convert.ToInt32(45);
+                    //outByte[2] = (byte)Convert.ToInt32((int)EE);  //joint3 
+                }
+                    if (EE == tile)
+                    {
+                        outByte[2] = (byte)Convert.ToInt32(90);
+                        outByte[3] = (byte)Convert.ToInt32(0);
+                    }
                 
 
             }
@@ -435,7 +440,6 @@ namespace pick_place_robot_GUI
                 }
             }
         }
-
 
         public int pixel_counter(Image<Bgr, Byte> image)
         {
@@ -503,7 +507,6 @@ namespace pick_place_robot_GUI
         {
             threshold = trackBar6.Value;
             textBox4.Text = trackBar6.Value.ToString();
-
         }
 
         private void radioButton1_CheckedChanged(object sender, EventArgs e)
@@ -682,8 +685,8 @@ namespace pick_place_robot_GUI
             if (int.Parse(textBox2.Text) > 180)
             { textBox2.Text = "180"; }
 
-            if (int.Parse(textBox2.Text) < 95)
-            { textBox2.Text = "95"; }
+            if (int.Parse(textBox2.Text) < 50)
+            { textBox2.Text = "50"; }
 
             if (trackBar5.Value.ToString() != textBox2.Text)
             { trackBar5.Value = int.Parse(textBox2.Text); }
@@ -701,8 +704,6 @@ namespace pick_place_robot_GUI
             { trackBar4.Value = int.Parse(textBox1.Text); }
 
         }
-
-
 
         //this is where the trig will be done to determine joint angles
         public double[] arm_trig(PointF j1, PointF j2, PointF jE)
