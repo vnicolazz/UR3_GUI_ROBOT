@@ -40,7 +40,6 @@ namespace pick_place_robot_GUI
         delegate void displayTextDelegate(String S, TextBox textbox);
         global_counter count = new global_counter();
         
-
         struct HSV_joint
         {
             public int hue;
@@ -65,11 +64,10 @@ namespace pick_place_robot_GUI
         PointF t_p1 = new PointF(5, 4);
         PointF t_p2 = new PointF(4, 6);
         PointF t_p3 = new PointF(6, 6);
-        
-
-        
-
+       
         robot scara = new robot();
+        bool isSeen;
+       
 
         public Form1()
         {
@@ -112,6 +110,7 @@ namespace pick_place_robot_GUI
             textBox6.Text = serPort.BaudRate.ToString();
             numericUpDown1.Value = decimal.Parse(ComPort);
             radioButton5.Checked = true;
+            isSeen = false;
 
             SerReady = false;
             Ser_Alternate = 0;
@@ -232,10 +231,7 @@ namespace pick_place_robot_GUI
 
                 }
 
-            if(!triTile.Centeroid.IsEmpty)
-            {
-                //tricount++;
-            }
+
 
             Image<Bgr, Byte> triangleRectangleImage = img.CopyBlank();
             //triangleRectangleImage.Resize(imageBox5.Width, imageBox5.Height, Emgu.CV.CvEnum.INTER.CV_INTER_LINEAR);
@@ -297,22 +293,22 @@ namespace pick_place_robot_GUI
             {
                 mb_center = boxList1[1].center;
                 eb_center = boxList1[0].center;
+                MCvBox2D mb = boxList1[1];
+                MCvBox2D eb = boxList1[0];
+
+                if(mb.center.X > eb.center.X)
+                {
+                    boxList1[1] = eb;
+                    boxList1[0] = mb;
+                    midBox = eb;
+                    endBox = mb;
+                }
 
                 LineSegment2DF radial_line = new LineSegment2DF(midBox.center, endBox.center);
                 dispString(radial_line.Length.ToString(), label26);
                 LineSegment2DF tri_radial_line = new LineSegment2DF(baseTri.Centeroid, midBox.center);
                 dispString(tri_radial_line.Length.ToString(), label25);
-                
-                MCvBox2D temp;
 
-                double X_distance, Y_distance, distance;
-                distance = 0;
-
-                //Draw Lines
-                foreach (MCvBox2D box in boxList1)
-                {
-                    comb_color.Draw(box, new Bgr(Color.Blue), 1);
-                }
                 comb_color.Draw(radial_line, new Bgr(Color.Silver), 2);
                 comb_color.Draw(tri_radial_line, new Bgr(Color.Silver), 2);
                 comb_color.Draw(endBox, new Bgr(Color.Green), 2);
@@ -320,7 +316,6 @@ namespace pick_place_robot_GUI
 
                 dispString(midBox.center.X.ToString(), label9);
                 dispString(endBox.center.X.ToString(), label18);
-
             }
 
             double[] arm_angle = new double[2];
@@ -328,11 +323,10 @@ namespace pick_place_robot_GUI
             Double D_ang1 = new double();
             Double ang1 = new double();
 
-            if (boxList1.Count == 2)
+            if (boxList1.Count == 2)            // && isSeen == false)
             {
                 ang1 = (-(Math.Atan2(boxList1[0].center.Y - baseTri.Centeroid.Y, boxList1[0].center.X - baseTri.Centeroid.X)
                         - Math.Atan2(153 - 153, 30 - 25)) * 180 / Math.PI);
-
 
                 if (!baseTri.Centeroid.IsEmpty && !boxList1[0].center.IsEmpty && !boxList1[1].center.IsEmpty)   //find angle between arms curently
                     arm_angle = arm_trig(baseTri.Centeroid, boxList1[1].center, boxList1[0].center);
@@ -341,11 +335,9 @@ namespace pick_place_robot_GUI
                     darm_angle = arm_trig(baseTri.Centeroid, boxList1[1].center, boxTile.center);
                     D_ang1 = (-(Math.Atan2(boxTile.center.Y - baseTri.Centeroid.Y, boxTile.center.X - baseTri.Centeroid.X)
                         - Math.Atan2(153 - 153, 30 - 25)) * 180 / Math.PI);
-                    //if(count.Get() == 0)
-                    //  count.addCnt();
-                    //else if(count.Get() == 2)
-                    updateScara((D_ang1 + darm_angle[0]), darm_angle[1], boxList1[0].center, boxTile.center);
 
+                    isSeen = true;
+                    updateScara((D_ang1 + darm_angle[0]), darm_angle[1], boxList1[0].center, boxTile.center);
                 }
                 else if (!baseTri.Centeroid.IsEmpty && !boxList1[0].center.IsEmpty && !triTile.Centeroid.IsEmpty)//TRI: find desired arm angle and angle from origin line to desired hyp line
                 {
@@ -407,15 +399,17 @@ namespace pick_place_robot_GUI
                 {
                     outByte[0] = (byte)Convert.ToInt32((int)one);  //joint1
                     outByte[1] = (byte)Convert.ToInt32((int)two);  //joint2
-                    outByte[2] = (byte)Convert.ToInt32(45);
-                    //outByte[2] = (byte)Convert.ToInt32((int)EE);  //joint3 
+                    outByte[2] = (byte)Convert.ToInt32(120);         //EE angle
+                    //outByte[2] = (byte)Convert.ToInt32((int)EE);  //joint3
+
                 }
-                    if (EE == tile)
-                    {
-                        outByte[2] = (byte)Convert.ToInt32(90);
-                        outByte[3] = (byte)Convert.ToInt32(0);
-                    }
-                
+                //else
+                //{
+                //    outByte[0] = (byte)Convert.ToInt32((int)one);  //joint1
+                //    outByte[1] = (byte)Convert.ToInt32((int)two);  //joint2
+                //    outByte[2] = (byte)Convert.ToInt32(90);
+                //    outByte[3] = (byte)Convert.ToInt32(1);
+                //}
 
             }
 
