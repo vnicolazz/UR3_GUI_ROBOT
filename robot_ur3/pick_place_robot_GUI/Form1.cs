@@ -38,7 +38,8 @@ namespace pick_place_robot_GUI
         int threshold = 211;
         delegate void displayStringDelegate(String s, Label label);
         delegate void displayTextDelegate(String S, TextBox textbox);
-        global_counter count = new global_counter();
+        //global_data count = new global_data();
+        global_data data = new global_data();
         
         struct HSV_joint
         {
@@ -64,6 +65,7 @@ namespace pick_place_robot_GUI
         PointF t_p1 = new PointF(5, 4);
         PointF t_p2 = new PointF(4, 6);
         PointF t_p3 = new PointF(6, 6);
+        PointF boxTileCenter = new PointF(0, 0);
        
         robot scara = new robot();
         bool isSeen;
@@ -103,8 +105,8 @@ namespace pick_place_robot_GUI
             
             trackBar6.Value = threshold;
             radioButton1.Checked = true;
-            trackBar4.Value = 70;
-            trackBar5.Value = 40;
+            trackBar4.Value = 45;
+            trackBar5.Value = 60;
             textBox1.Text = trackBar4.Value.ToString();
             textBox2.Text = trackBar5.Value.ToString();
             textBox6.Text = serPort.BaudRate.ToString();
@@ -135,10 +137,10 @@ namespace pick_place_robot_GUI
             //    mb_center = new PointF(5, 5);
             //    firstCatch = 1;
             //}
-            
+
             //PointF origin = new PointF(0, 0);
 
-            
+
 
             Image<Bgr, Byte> frame = _capture.RetrieveBgrFrame().Resize(imageBox1.Width, imageBox1.Height, Emgu.CV.CvEnum.INTER.CV_INTER_LINEAR);
             Image<Bgr, Byte> img = frame;
@@ -195,15 +197,15 @@ namespace pick_place_robot_GUI
                 {   // a contour: list of pixels that can represent a curve
                     Contour<Point> currentPolygon = contours.ApproxPoly(contours.Perimeter * 0.05, storage); // adjust here
 
-                    if (contours.Area > 50 && contours.Area < 200) //only consider contours with area greater than 250
+                    if (contours.Area > 110 && contours.Area < 200) //only consider contours with area greater than 250
                     {
                         if (currentPolygon.Total == 3) //The contour has 3 vertices, it is a triangle
                         {
-                            //bool isTriangle = true;
                             Point[] pts = currentPolygon.ToArray();
                             LineSegment2D[] edges = PointCollection.PolyLine(pts, true);
-                            //triangleList.Add(new Triangle2DF(pts[0], pts[1], pts[2]));
                             triTile = new Triangle2DF(pts[0], pts[1], pts[2]);
+                            dispString("Tri Center" + data.getTri().ToString(), label6);
+                            data.setTri(triTile.Centeroid);
                         }
                     }
                     else if (contours.Area > 200 && contours.Area < 800)
@@ -225,23 +227,26 @@ namespace pick_place_robot_GUI
                                 }
                             }
                             if (isRectangle)
-                                //boxList.Add(currentPolygon.GetMinAreaRect());
+                            {
                                 boxTile = currentPolygon.GetMinAreaRect();
+                                dispString("Box Center: " + data.getBox().ToString(), label5);
+                                data.setBox(boxTile.center);
+                            }
                         }
-
                 }
 
 
+            //dispString(boxTileCenter.ToString(), label20);
 
             Image<Bgr, Byte> triangleRectangleImage = img.CopyBlank();
             //triangleRectangleImage.Resize(imageBox5.Width, imageBox5.Height, Emgu.CV.CvEnum.INTER.CV_INTER_LINEAR);
 
-            
+
 
             comb_color.Draw(triTile, new Bgr(Color.Yellow), 1);
             comb_color.Draw(boxTile, new Bgr(Color.Yellow), 1);
-            dispString("Triangle centroid: " + triTile.Centeroid.ToString(), label6);
-            dispString("box center: " + boxTile.center.ToString(), label5);
+            //dispString("Triangle centroid: " + triTile.Centeroid.ToString(), label6);
+            //dispString("box center: " + boxTile.center.ToString(), label5);
 
             //***********************************************************************************************************
             //************************************HSV Shape Detection****************************************************
@@ -259,9 +264,8 @@ namespace pick_place_robot_GUI
                             //bool isTriangle = true;
                             Point[] pts = currentPolygon.ToArray();
                             LineSegment2D[] edges = PointCollection.PolyLine(pts, true);
-
-                            //triangleList.Add(new Triangle2DF(pts[0], pts[1], pts[2]));
                             baseTri = new Triangle2DF(pts[0], pts[1], pts[2]);
+                            data.setj1(baseTri.Centeroid);
                         }
                         if (currentPolygon.Total == 4) //The contour has 4 vertices.
                         {
@@ -286,7 +290,7 @@ namespace pick_place_robot_GUI
                     }
                 }
 
-            
+
             comb_color.Draw(baseTri, new Bgr(Color.AliceBlue), 2);
 
             if (boxList1.Count == 2)
@@ -296,17 +300,20 @@ namespace pick_place_robot_GUI
                 MCvBox2D mb = boxList1[1];
                 MCvBox2D eb = boxList1[0];
 
-                if(mb.center.X > eb.center.X)
+                if (mb.center.X > eb.center.X)
                 {
                     boxList1[1] = eb;
                     boxList1[0] = mb;
-                    midBox = eb;
-                    endBox = mb;
                 }
 
-                LineSegment2DF radial_line = new LineSegment2DF(midBox.center, endBox.center);
+                data.setj2(boxList1[1].center);     //midbox
+                data.setj3(boxList1[0].center);     //end effector
+                midBox.center = data.getj2();
+                endBox.center = data.getj3();
+
+                LineSegment2DF radial_line = new LineSegment2DF(data.getj2(), data.getj3());
                 dispString(radial_line.Length.ToString(), label26);
-                LineSegment2DF tri_radial_line = new LineSegment2DF(baseTri.Centeroid, midBox.center);
+                LineSegment2DF tri_radial_line = new LineSegment2DF(data.getj1(), data.getj2());
                 dispString(tri_radial_line.Length.ToString(), label25);
 
                 comb_color.Draw(radial_line, new Bgr(Color.Silver), 2);
@@ -314,8 +321,8 @@ namespace pick_place_robot_GUI
                 comb_color.Draw(endBox, new Bgr(Color.Green), 2);
                 comb_color.Draw(midBox, new Bgr(Color.Brown), 2);
 
-                dispString(midBox.center.X.ToString(), label9);
-                dispString(endBox.center.X.ToString(), label18);
+                //dispString(data.getj2().X.ToString(), label9);
+                dispString(data.getj3().X.ToString(), label18);
             }
 
             double[] arm_angle = new double[2];
@@ -323,32 +330,56 @@ namespace pick_place_robot_GUI
             Double D_ang1 = new double();
             Double ang1 = new double();
 
+            ////if (boxList1.Count == 2)            // && isSeen == false)
+            //{
+            //    ang1 = (-(Math.Atan2(data.getj3().Y - data.getj1().Y, data.getj3().X - data.getj1().X)
+            //            - Math.Atan2(153 - 153, 30 - 25)) * 180 / Math.PI);
+
+            //    if (!baseTri.Centeroid.IsEmpty && !boxList1[0].center.IsEmpty && !boxList1[1].center.IsEmpty)   //find angle between arms curently
+            //        arm_angle = arm_trig(data.getj1(), data.getj2(), data.getj3());
+            //    if (!baseTri.Centeroid.IsEmpty && !boxList1[0].center.IsEmpty && (data.getBox() != null))        // BOX: find desired arm angle and angle from origin line to desired hyp line
+            //    {
+            //        darm_angle = arm_trig(data.getj1(), data.getj2(), data.getBox());
+            //        D_ang1 = (-(Math.Atan2(data.getBox().Y - data.getj1().Y, data.getBox().X - data.getj1().X)
+            //            - Math.Atan2(153 - 153, 30 - 25)) * 180 / Math.PI);
+
+            //        updateScara((D_ang1 + darm_angle[0]), darm_angle[1], data.getj3(), data.getBox());
+            //    }
+            //    else if (!baseTri.Centeroid.IsEmpty && !boxList1[0].center.IsEmpty && !triTile.Centeroid.IsEmpty)//TRI: find desired arm angle and angle from origin line to desired hyp line
+            //    {
+            //        darm_angle = arm_trig(data.getj1(), data.getj2(), data.getTri());
+            //        D_ang1 = (-(Math.Atan2(data.getTri().Y - data.getj1().Y, data.getTri().X - data.getj1().X)
+            //            - Math.Atan2(153 - 153, 30 - 25)) * 180 / Math.PI);
+            //    }
+            //}
+            //else if (boxList1.Count < 2)
+            //    updateScara(90, 90, data.getTri(), data.getBox());
+
             if (boxList1.Count == 2)            // && isSeen == false)
             {
-                ang1 = (-(Math.Atan2(boxList1[0].center.Y - baseTri.Centeroid.Y, boxList1[0].center.X - baseTri.Centeroid.X)
+                ang1 = (-(Math.Atan2(data.getj3().Y - data.getj1().Y, data.getj3().X - data.getj1().X)
                         - Math.Atan2(153 - 153, 30 - 25)) * 180 / Math.PI);
 
-                if (!baseTri.Centeroid.IsEmpty && !boxList1[0].center.IsEmpty && !boxList1[1].center.IsEmpty)   //find angle between arms curently
-                    arm_angle = arm_trig(baseTri.Centeroid, boxList1[1].center, boxList1[0].center);
-                if(!baseTri.Centeroid.IsEmpty && !boxList1[0].center.IsEmpty && !boxTile.center.IsEmpty)        // BOX: find desired arm angle and angle from origin line to desired hyp line
-                {   
-                    darm_angle = arm_trig(baseTri.Centeroid, boxList1[1].center, boxTile.center);
-                    D_ang1 = (-(Math.Atan2(boxTile.center.Y - baseTri.Centeroid.Y, boxTile.center.X - baseTri.Centeroid.X)
-                        - Math.Atan2(153 - 153, 30 - 25)) * 180 / Math.PI);
-
-                    isSeen = true;
-                    updateScara((D_ang1 + darm_angle[0]), darm_angle[1], boxList1[0].center, boxTile.center);
-                }
-                else if (!baseTri.Centeroid.IsEmpty && !boxList1[0].center.IsEmpty && !triTile.Centeroid.IsEmpty)//TRI: find desired arm angle and angle from origin line to desired hyp line
+                if (data.getj1() != null && data.getj3() != null && data.getj2() != null)   //find angle between arms curently
+                    arm_angle = arm_trig(data.getj1(), data.getj2(), data.getj3());
+                if (data.getj1() != null && data.getj3() != null && data.getBox() != null)        // BOX: find desired arm angle and angle from origin line to desired hyp line
                 {
-                    darm_angle = arm_trig(baseTri.Centeroid, boxList1[1].center, triTile.Centeroid);
-                    D_ang1 = (-(Math.Atan2(triTile.Centeroid.Y - baseTri.Centeroid.Y, triTile.Centeroid.X - baseTri.Centeroid.X)
+                    darm_angle = arm_trig(data.getj1(), data.getj2(), data.getBox());
+                    D_ang1 = (-(Math.Atan2(data.getBox().Y - data.getj1().Y, data.getBox().X - data.getj1().X)
                         - Math.Atan2(153 - 153, 30 - 25)) * 180 / Math.PI);
-                }
-                // if tile is seen 5 times, save value and move to location
-                //updateScara((D_ang1 + darm_angle[0]), darm_angle[1]);
 
+                    updateScara((D_ang1 + darm_angle[0]), darm_angle[1], data.getj3(), data.getBox());
+                }
+                else if (data.getj1() != null && data.getj3() != null && data.getTri() != null)//TRI: find desired arm angle and angle from origin line to desired hyp line
+                {
+                    darm_angle = arm_trig(data.getj1(), data.getj2(), data.getTri());
+                    D_ang1 = (-(Math.Atan2(data.getTri().Y - data.getj1().Y, data.getTri().X - data.getj1().X)
+                        - Math.Atan2(153 - 153, 30 - 25)) * 180 / Math.PI);
+                    updateScara((D_ang1 + darm_angle[0]), darm_angle[1], data.getj3(), data.getBox());
+                }
             }
+            else if (boxList1.Count < 2)
+                updateScara(60, 90, data.getTri(), data.getBox());
 
             dispString("Ang_B = " + arm_angle[0].ToString(), label10);
             dispString("Ang_C = " + arm_angle[1].ToString(), label11);
@@ -358,7 +389,7 @@ namespace pick_place_robot_GUI
             dispString("Hyp we have " + ang1.ToString(), label21);
 
             comb_color.Draw(oline, new Bgr(Color.Red), 1);
-            imageBox4.Image = comb_color;  
+            imageBox4.Image = comb_color;
 
             //END OF CAPTURE
         }
@@ -377,7 +408,7 @@ namespace pick_place_robot_GUI
                 }
                 else if (radioButton5.Checked)    //move
                 {
-                    outByte[2] = (byte)Convert.ToInt32(40);
+                    outByte[2] = (byte)Convert.ToInt32(100); //was 40
                 }
                 else if (radioButton6.Checked)    //drop
                 {
@@ -392,25 +423,19 @@ namespace pick_place_robot_GUI
             }
             else if(checkBox2.Checked == true)
             {
-                //double j1 = scara.getJ1();
-                //double j2 = scara.getJ2();
-                //double EE = scara.getEE();
-                if(EE != tile)
+                if (EE == tile)
                 {
                     outByte[0] = (byte)Convert.ToInt32((int)one);  //joint1
                     outByte[1] = (byte)Convert.ToInt32((int)two);  //joint2
-                    outByte[2] = (byte)Convert.ToInt32(120);         //EE angle
-                    //outByte[2] = (byte)Convert.ToInt32((int)EE);  //joint3
-
+                    outByte[2] = (byte)Convert.ToInt32(90);
+                    outByte[3] = (byte)Convert.ToInt32(1);
                 }
-                //else
-                //{
-                //    outByte[0] = (byte)Convert.ToInt32((int)one);  //joint1
-                //    outByte[1] = (byte)Convert.ToInt32((int)two);  //joint2
-                //    outByte[2] = (byte)Convert.ToInt32(90);
-                //    outByte[3] = (byte)Convert.ToInt32(1);
-                //}
-
+                else if(EE != tile)
+                {
+                    outByte[0] = (byte)Convert.ToInt32((int)one);  //joint1
+                    outByte[1] = (byte)Convert.ToInt32((int)two);  //joint2
+                    outByte[2] = (byte)Convert.ToInt32(45);         //EE angle
+                }            
             }
 
             if (serPort.IsOpen)
