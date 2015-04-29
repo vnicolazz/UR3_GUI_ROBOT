@@ -322,6 +322,8 @@ namespace pick_place_robot_GUI
             int D_ang1 = new int();
             int ang1 = new int();
 
+            #region Math for desired angles
+
             //if (boxList1.Count == 2)            // && isSeen == false)
             {
                 ang1 = (int)(-(Math.Atan2(data.getj3().Y - data.getj1().Y, data.getj3().X - data.getj1().X)
@@ -335,8 +337,11 @@ namespace pick_place_robot_GUI
                     D_ang1 = (int)(-(Math.Atan2(data.getBox().Y - data.getj1().Y, data.getBox().X - data.getj1().X)
                         - Math.Atan2(153 - 153, 30 - 25)) * 180 / Math.PI);
 
-                    data.setdj1(darm_angle[0]);
-                    data.setdj2(darm_angle[1]);
+                    if (sameSpot(boxTile.center, 0) != true)
+                    {
+                        data.setdj1(darm_angle[0]);
+                        data.setdj2(darm_angle[1]);
+                    }
 
                     updateScara((data.getdj1() + D_ang1), data.getdj2(), data.getj3(), data.getBox());
                     //updateScara((data.getdj1()), data.getdj2(), data.getj3(), data.getBox());
@@ -351,6 +356,8 @@ namespace pick_place_robot_GUI
             }
             //else if (boxList1.Count < 2)
                 //updateScara(60, 90, data.getTri(), data.getBox());
+
+#endregion
 
             dispString("Ang_B = " + arm_angle[0].ToString(), label10);
             dispString("Ang_C = " + arm_angle[1].ToString(), label11);
@@ -392,7 +399,7 @@ namespace pick_place_robot_GUI
                 else
                     outByte[3] = (byte)Convert.ToInt32(0);
             }
-            else if(checkBox2.Checked == true)
+            else if(checkBox2.Checked == true)//Autonomous Mode
             {
                 if (EE != tile)
                 {
@@ -412,26 +419,29 @@ namespace pick_place_robot_GUI
 
             if (serPort.IsOpen)
             {
-                if (SerReady)
+                if (!checkBox2.Checked)//Send data when not in autonomous
                 {
-                    serPort.Write(outByte, 0, 4);
-                    SerReady = false;
-                }
-                else if (!SerReady)
-                {
-                    //while (!SerReady) { /*Do nothing while Serial Port is not ready*/}
-                    if ((Ser_Alternate % 2) == 1)//alternate between two button clicks
+                    if (SerReady)
                     {
-                        serPort.Write(outByte, 0, outByte.Length);
-                        Ser_Alternate++;
+                        serPort.Write(outByte, 0, 4);
+                        SerReady = false;
                     }
+                    else if (!SerReady)
+                    {
+                        if ((Ser_Alternate % 2) == 1)//alternate between two button clicks
+                        {
+                            serPort.Write(outByte, 0, outByte.Length);
+                            Ser_Alternate++;
+                        }
 
-                    if (Ser_Alternate == 4)
-                        Ser_Alternate = 0;
+                        if (Ser_Alternate == 4)
+                            Ser_Alternate = 0;
+                    }
                 }
             }
         }
 
+#region Form Control
         public int pixel_counter(Image<Bgr, Byte> image)
         {
             int pixel_count = 0;
@@ -472,10 +482,13 @@ namespace pick_place_robot_GUI
             if (num == 1)
                 SerReady = true;
 
-            if ((Ser_Alternate % 2) == 0)//alternate between two button clicks
+            if (!checkBox2.Checked)//do not use in autonomous mode
             {
-                serPort.Write(outByte, 0, outByte.Length);
-                Ser_Alternate++;
+                if ((Ser_Alternate % 2) == 0)//alternate between two button clicks
+                {
+                    serPort.Write(outByte, 0, outByte.Length);
+                    Ser_Alternate++;
+                }
             }
         }
 
@@ -695,6 +708,7 @@ namespace pick_place_robot_GUI
             { trackBar4.Value = int.Parse(textBox1.Text); }
 
         }
+#endregion
 
         //this is where the trig will be done to determine joint angles
         public int[] arm_trig(PointF j1, PointF j2, PointF jE)
@@ -724,6 +738,28 @@ namespace pick_place_robot_GUI
 
             return angle;
 
+        }
+
+        private bool sameSpot(PointF point, int identifier)
+        {
+            if(identifier == 0)
+            {
+                if ((point.X < (data.getBox().X + 2) || point.X > (data.getBox().X - 2)) &&
+                     (point.X < (data.getBox().Y + 2) || point.Y > (data.getBox().X - 2)))
+                    return true;
+                else
+                    return false;
+            }
+            else if(identifier == 1)
+            {
+                if ((point.X < (data.getTri().X + 2) || point.X > (data.getTri().X - 2)) &&
+                    (point.X < (data.getTri().Y + 2) || point.Y > (data.getTri().X - 2)))
+                    return true;
+                else 
+                    return false;          
+            }
+            else
+                return false;
         }
 
         private void checkBox2_CheckedChanged(object sender, EventArgs e)
