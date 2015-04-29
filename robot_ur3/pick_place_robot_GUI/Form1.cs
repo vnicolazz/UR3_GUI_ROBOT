@@ -69,7 +69,8 @@ namespace pick_place_robot_GUI
        
         robot scara = new robot();
         bool isSeen;
-       
+
+        MCvBox2D previous;       
 
         public Form1()
         {
@@ -102,7 +103,6 @@ namespace pick_place_robot_GUI
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            
             trackBar6.Value = threshold;
             radioButton1.Checked = true;
             trackBar4.Value = 45;
@@ -114,10 +114,10 @@ namespace pick_place_robot_GUI
             radioButton5.Checked = true;
             isSeen = false;
 
-            SerReady = false;
+            SerReady = true;
             Ser_Alternate = 0;
 
-            _capture = new Capture();
+            _capture = new Capture(1);
             _capture.ImageGrabbed += Display_Captured;	//grab event handler
             _capture.Start();
         }
@@ -337,7 +337,7 @@ namespace pick_place_robot_GUI
                     D_ang1 = (int)(-(Math.Atan2(data.getBox().Y - data.getj1().Y, data.getBox().X - data.getj1().X)
                         - Math.Atan2(153 - 153, 30 - 25)) * 180 / Math.PI);
 
-                    if (sameSpot(boxTile.center, 0) != true)
+                    if (sameSpot(previous.center, 0) == false)
                     {
                         data.setdj1(darm_angle[0]);
                         data.setdj2(darm_angle[1]);
@@ -368,6 +368,9 @@ namespace pick_place_robot_GUI
 
             comb_color.Draw(oline, new Bgr(Color.Red), 1);
             imageBox4.Image = comb_color;
+
+            //record preious boxtile
+            previous = boxTile;
 
             //END OF CAPTURE
         }
@@ -438,7 +441,15 @@ namespace pick_place_robot_GUI
                             Ser_Alternate = 0;
                     }
                 }
+                else //Send data in Autonomous Mode
+                {
+                    if(SerReady)
+                    {
+                        serPort.Write(outByte, 0, outByte.Length);
+                    }
+                }
             }
+            //End of updata SCARA
         }
 
 #region Form Control
@@ -744,16 +755,16 @@ namespace pick_place_robot_GUI
         {
             if(identifier == 0)
             {
-                if ((point.X < (data.getBox().X + 2) || point.X > (data.getBox().X - 2)) &&
-                     (point.X < (data.getBox().Y + 2) || point.Y > (data.getBox().X - 2)))
+                if ((point.X < (data.getBox().X + 2) && point.X > (data.getBox().X - 2)) &&
+                     (point.Y < (data.getBox().Y + 2) & point.Y > (data.getBox().Y - 2)))
                     return true;
                 else
                     return false;
             }
             else if(identifier == 1)
             {
-                if ((point.X < (data.getTri().X + 2) || point.X > (data.getTri().X - 2)) &&
-                    (point.X < (data.getTri().Y + 2) || point.Y > (data.getTri().X - 2)))
+                if ((point.X < (data.getTri().X + 2) && point.X > (data.getTri().X - 2)) &&
+                    (point.Y < (data.getTri().Y + 2) && point.Y > (data.getTri().Y - 2)))
                     return true;
                 else 
                     return false;          
