@@ -16,6 +16,9 @@ namespace HiEmgu
         private static PointF j1;
         private static PointF j2;
         private static PointF j3;
+        private static int dj1;
+        private static int dj2;
+
 
         public global_data()
         {
@@ -25,6 +28,9 @@ namespace HiEmgu
             j1 = new PointF(0, 0);
             j2 = new PointF(0, 0);
             j3 = new PointF(0, 0);
+            dj1 = 0;
+            dj2 = 0;
+
         }
         public void addCnt()
         { counter++; }
@@ -38,6 +44,10 @@ namespace HiEmgu
         { j2 = point; }
         public void setj3(PointF point)
         { j3 = point; }
+        public void setdj1(int val)
+        { dj1 = val; }
+        public void setdj2(int val)
+        { dj2 = val; }
 
         public PointF getBox()
         { return boxTile; }
@@ -49,6 +59,9 @@ namespace HiEmgu
         { return j2; }
         public PointF getj3()
         { return j3; }
-        
+        public int getdj1()
+        { return dj1; }
+        public int getdj2()
+        { return dj2; }        
     }
 }

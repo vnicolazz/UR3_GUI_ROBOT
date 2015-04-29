@@ -235,18 +235,10 @@ namespace pick_place_robot_GUI
                         }
                 }
 
-
-            //dispString(boxTileCenter.ToString(), label20);
-
             Image<Bgr, Byte> triangleRectangleImage = img.CopyBlank();
-            //triangleRectangleImage.Resize(imageBox5.Width, imageBox5.Height, Emgu.CV.CvEnum.INTER.CV_INTER_LINEAR);
-
-
 
             comb_color.Draw(triTile, new Bgr(Color.Yellow), 1);
             comb_color.Draw(boxTile, new Bgr(Color.Yellow), 1);
-            //dispString("Triangle centroid: " + triTile.Centeroid.ToString(), label6);
-            //dispString("box center: " + boxTile.center.ToString(), label5);
 
             //***********************************************************************************************************
             //************************************HSV Shape Detection****************************************************
@@ -325,39 +317,14 @@ namespace pick_place_robot_GUI
                 dispString(data.getj3().X.ToString(), label18);
             }
 
-            double[] arm_angle = new double[2];
-            double[] darm_angle = new double[2];
-            Double D_ang1 = new double();
-            Double ang1 = new double();
+            int[] arm_angle = new int[2];
+            int[] darm_angle = new int[2];
+            int D_ang1 = new int();
+            int ang1 = new int();
 
-            ////if (boxList1.Count == 2)            // && isSeen == false)
-            //{
-            //    ang1 = (-(Math.Atan2(data.getj3().Y - data.getj1().Y, data.getj3().X - data.getj1().X)
-            //            - Math.Atan2(153 - 153, 30 - 25)) * 180 / Math.PI);
-
-            //    if (!baseTri.Centeroid.IsEmpty && !boxList1[0].center.IsEmpty && !boxList1[1].center.IsEmpty)   //find angle between arms curently
-            //        arm_angle = arm_trig(data.getj1(), data.getj2(), data.getj3());
-            //    if (!baseTri.Centeroid.IsEmpty && !boxList1[0].center.IsEmpty && (data.getBox() != null))        // BOX: find desired arm angle and angle from origin line to desired hyp line
-            //    {
-            //        darm_angle = arm_trig(data.getj1(), data.getj2(), data.getBox());
-            //        D_ang1 = (-(Math.Atan2(data.getBox().Y - data.getj1().Y, data.getBox().X - data.getj1().X)
-            //            - Math.Atan2(153 - 153, 30 - 25)) * 180 / Math.PI);
-
-            //        updateScara((D_ang1 + darm_angle[0]), darm_angle[1], data.getj3(), data.getBox());
-            //    }
-            //    else if (!baseTri.Centeroid.IsEmpty && !boxList1[0].center.IsEmpty && !triTile.Centeroid.IsEmpty)//TRI: find desired arm angle and angle from origin line to desired hyp line
-            //    {
-            //        darm_angle = arm_trig(data.getj1(), data.getj2(), data.getTri());
-            //        D_ang1 = (-(Math.Atan2(data.getTri().Y - data.getj1().Y, data.getTri().X - data.getj1().X)
-            //            - Math.Atan2(153 - 153, 30 - 25)) * 180 / Math.PI);
-            //    }
-            //}
-            //else if (boxList1.Count < 2)
-            //    updateScara(90, 90, data.getTri(), data.getBox());
-
-            if (boxList1.Count == 2)            // && isSeen == false)
+            //if (boxList1.Count == 2)            // && isSeen == false)
             {
-                ang1 = (-(Math.Atan2(data.getj3().Y - data.getj1().Y, data.getj3().X - data.getj1().X)
+                ang1 = (int)(-(Math.Atan2(data.getj3().Y - data.getj1().Y, data.getj3().X - data.getj1().X)
                         - Math.Atan2(153 - 153, 30 - 25)) * 180 / Math.PI);
 
                 if (data.getj1() != null && data.getj3() != null && data.getj2() != null)   //find angle between arms curently
@@ -365,26 +332,30 @@ namespace pick_place_robot_GUI
                 if (data.getj1() != null && data.getj3() != null && data.getBox() != null)        // BOX: find desired arm angle and angle from origin line to desired hyp line
                 {
                     darm_angle = arm_trig(data.getj1(), data.getj2(), data.getBox());
-                    D_ang1 = (-(Math.Atan2(data.getBox().Y - data.getj1().Y, data.getBox().X - data.getj1().X)
+                    D_ang1 = (int)(-(Math.Atan2(data.getBox().Y - data.getj1().Y, data.getBox().X - data.getj1().X)
                         - Math.Atan2(153 - 153, 30 - 25)) * 180 / Math.PI);
 
-                    updateScara((D_ang1 + darm_angle[0]), darm_angle[1], data.getj3(), data.getBox());
+                    data.setdj1(darm_angle[0]);
+                    data.setdj2(darm_angle[1]);
+
+                    updateScara((data.getdj1() + D_ang1), data.getdj2(), data.getj3(), data.getBox());
+                    //updateScara((data.getdj1()), data.getdj2(), data.getj3(), data.getBox());
                 }
-                else if (data.getj1() != null && data.getj3() != null && data.getTri() != null)//TRI: find desired arm angle and angle from origin line to desired hyp line
+                else if (data.getj1() != null && data.getj3() != null && data.getTri() != null) //TRI: find desired arm angle and angle from origin line to desired hyp line
                 {
                     darm_angle = arm_trig(data.getj1(), data.getj2(), data.getTri());
-                    D_ang1 = (-(Math.Atan2(data.getTri().Y - data.getj1().Y, data.getTri().X - data.getj1().X)
+                    D_ang1 = (int)(-(Math.Atan2(data.getTri().Y - data.getj1().Y, data.getTri().X - data.getj1().X)
                         - Math.Atan2(153 - 153, 30 - 25)) * 180 / Math.PI);
                     updateScara((D_ang1 + darm_angle[0]), darm_angle[1], data.getj3(), data.getBox());
                 }
             }
-            else if (boxList1.Count < 2)
-                updateScara(60, 90, data.getTri(), data.getBox());
+            //else if (boxList1.Count < 2)
+                //updateScara(60, 90, data.getTri(), data.getBox());
 
             dispString("Ang_B = " + arm_angle[0].ToString(), label10);
             dispString("Ang_C = " + arm_angle[1].ToString(), label11);
-            dispString("D_Ang_B = " + darm_angle[0].ToString(), label8); //desired angles
-            dispString("D_Ang_C = " + darm_angle[1].ToString(), label9); //desired angles
+            dispString("D_Ang_B = " + data.getdj1().ToString(), label8); //desired angles
+            dispString("D_Ang_C = " + data.getdj2().ToString(), label9); //desired angles
             dispString("Hyp we need " + D_ang1.ToString(), label15);
             dispString("Hyp we have " + ang1.ToString(), label21);
 
@@ -394,7 +365,7 @@ namespace pick_place_robot_GUI
             //END OF CAPTURE
         }
 
-        public void updateScara(double one, double two, PointF EE, PointF tile)
+        public void updateScara(int one, int two, PointF EE, PointF tile)
         {
             if (checkBox2.Checked == false)
             {
@@ -423,19 +394,20 @@ namespace pick_place_robot_GUI
             }
             else if(checkBox2.Checked == true)
             {
-                if (EE == tile)
+                if (EE != tile)
+                {
+                    outByte[0] = (byte)Convert.ToInt32(one);  //joint1
+                    outByte[1] = (byte)Convert.ToInt32(two);  //joint2
+                    outByte[2] = (byte)Convert.ToInt32(45);         //EE angle
+                    outByte[3] = (byte)Convert.ToInt32(0);
+                }
+                else if (EE == tile)
                 {
                     outByte[0] = (byte)Convert.ToInt32((int)one);  //joint1
                     outByte[1] = (byte)Convert.ToInt32((int)two);  //joint2
                     outByte[2] = (byte)Convert.ToInt32(90);
                     outByte[3] = (byte)Convert.ToInt32(1);
                 }
-                else if(EE != tile)
-                {
-                    outByte[0] = (byte)Convert.ToInt32((int)one);  //joint1
-                    outByte[1] = (byte)Convert.ToInt32((int)two);  //joint2
-                    outByte[2] = (byte)Convert.ToInt32(45);         //EE angle
-                }            
             }
 
             if (serPort.IsOpen)
@@ -704,8 +676,8 @@ namespace pick_place_robot_GUI
             if (int.Parse(textBox2.Text) > 180)
             { textBox2.Text = "180"; }
 
-            if (int.Parse(textBox2.Text) < 50)
-            { textBox2.Text = "50"; }
+            if (int.Parse(textBox2.Text) < 10)
+            { textBox2.Text = "10"; }
 
             if (trackBar5.Value.ToString() != textBox2.Text)
             { trackBar5.Value = int.Parse(textBox2.Text); }
@@ -725,7 +697,7 @@ namespace pick_place_robot_GUI
         }
 
         //this is where the trig will be done to determine joint angles
-        public double[] arm_trig(PointF j1, PointF j2, PointF jE)
+        public int[] arm_trig(PointF j1, PointF j2, PointF jE)
         {
             LineSegment2DF sideA = new LineSegment2DF(j1, j2);
             LineSegment2DF sideB = new LineSegment2DF(j2, jE);
@@ -739,16 +711,16 @@ namespace pick_place_robot_GUI
             double ang_b;
             double ang_c;
 
-            ang_b = Math.Acos((b_lgth * b_lgth - a_lgth * a_lgth - c_lgth * c_lgth) / (-2 * a_lgth * c_lgth));
-            ang_c = Math.Acos((c_lgth*c_lgth - a_lgth*a_lgth - b_lgth*b_lgth)/(-2*a_lgth*b_lgth));
+            ang_b = (Math.Acos((b_lgth * b_lgth - a_lgth * a_lgth - c_lgth * c_lgth) / (-2 * a_lgth * c_lgth)));
+            ang_c = (Math.Acos((c_lgth*c_lgth - a_lgth*a_lgth - b_lgth*b_lgth)/(-2*a_lgth*b_lgth)));
 
-            ang_b = (ang_b * 180) / Math.PI;
-            ang_c = (ang_c * 180) / Math.PI;
+            ang_b = ((ang_b * 180) / Math.PI);
+            ang_c = ((ang_c * 180) / Math.PI);
 
-            double[] angle = new double[2];
+            int[] angle = new int[2];
 
-            angle[0] = ang_b;
-            angle[1] = ang_c;
+            angle[0] = (int)ang_b;
+            angle[1] = (int)ang_c;
 
             return angle;
 
