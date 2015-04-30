@@ -71,9 +71,10 @@ namespace pick_place_robot_GUI
         PointF boxTileCenter = new PointF(0, 0);
        
         robot scara = new robot();
-        bool isSeen;
+        int sequence = 0;
 
-        MCvBox2D previous;       
+        PointF previous;
+        double X_multiple, X_addition, Y_multiple, Y_addition;
 
         public Form1()
         {
@@ -106,6 +107,10 @@ namespace pick_place_robot_GUI
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            X_multiple = (double)X_Proportional.Value;
+            X_addition = (double)X_plus.Value;
+            Y_multiple = (double)Y_Proportional.Value;
+            Y_addition = (double)Y_plus.Value;
             Bicep_Length.Value = (decimal)152.5;
             Forearm_Length.Value = (decimal)62;
             A_Length = (int)Bicep_Length.Value;
@@ -119,7 +124,6 @@ namespace pick_place_robot_GUI
             textBox6.Text = serPort.BaudRate.ToString();
             numericUpDown1.Value = decimal.Parse(ComPort);
             radioButton5.Checked = true;
-            isSeen = false;
 
             SerReady = true;
             Ser_Alternate = 0;
@@ -330,27 +334,29 @@ namespace pick_place_robot_GUI
             int ang1 = new int();
 
             #region Math for desired angles
-
+            //data.setBox(eeAlter(data.getBox()));  
             //if (boxList1.Count == 2)            // && isSeen == false)
             {
                 ang1 = (int)(-(Math.Atan2(data.getj3().Y - data.getj1().Y, data.getj3().X - data.getj1().X)
                         - Math.Atan2(153 - 153, 30 - 25)) * 180 / Math.PI);
 
-                if (data.getj1() != null && data.getj3() != null && data.getj2() != null)   //find angle between arms curently
+                if ((data.getj1() != null) && (data.getj3() != null) && (data.getj2() != null))   //find angle between arms curently
                     arm_angle = arm_trig(data.getj1(), data.getj2(), data.getj3());
-                if (data.getj1() != null && data.getj3() != null && data.getBox() != null)        // BOX: find desired arm angle and angle from origin line to desired hyp line
-                {
-                    darm_angle = arm_trig(data.getj1(), data.getj2(), data.getBox());
+                if ((data.getj1() != null) && (data.getj3() != null) && (data.getBox() != null))        // BOX: find desired arm angle and angle from origin line to desired hyp line
+                {                 
+                    darm_angle = arm_trig(data.getj1(), data.getj2(), eeAlter(data.getBox()));
                     D_ang1 = (int)(-(Math.Atan2(data.getBox().Y - data.getj1().Y, data.getBox().X - data.getj1().X)
                         - Math.Atan2(153 - 153, 30 - 25)) * 180 / Math.PI);
 
-                    if (sameSpot(previous.center, 0) == false)
+                    if (sameSpot(previous, 0) == false)
                     {
                         data.setdj1(darm_angle[0]);
                         data.setdj2(darm_angle[1]);
                     }
 
-                    updateScara((data.getdj1() + D_ang1), data.getdj2(), data.getj3(), data.getBox());
+                    //jAlter(180 -(data.getdj2()))
+                    //if(data.getj3() != null && data.getBox() != null)
+                        updateScara((data.getdj1() + D_ang1), (180 - data.getdj2()), data.getj3(), eeAlter(data.getBox()));
                     //updateScara((data.getdj1()), data.getdj2(), data.getj3(), data.getBox());
                 }
                 else if (data.getj1() != null && data.getj3() != null && data.getTri() != null) //TRI: find desired arm angle and angle from origin line to desired hyp line
@@ -365,7 +371,7 @@ namespace pick_place_robot_GUI
                 //updateScara(60, 90, data.getTri(), data.getBox());
 
 #endregion
-
+            dispString("EE point" + data.getj3().ToString(), label22);
             dispString("Ang_B = " + arm_angle[0].ToString(), label10);
             dispString("Ang_C = " + arm_angle[1].ToString(), label11);
             dispString("D_Ang_B = " + data.getdj1().ToString(), label8); //desired angles
@@ -377,7 +383,7 @@ namespace pick_place_robot_GUI
             imageBox4.Image = comb_color;
 
             //record preious boxtile
-            previous = boxTile;
+            previous = data.getBox();
 
             //END OF CAPTURE
         }
@@ -411,21 +417,55 @@ namespace pick_place_robot_GUI
             }
             else if(checkBox2.Checked == true)//Autonomous Mode
             {
-                if (EE != tile)
-                {
+                tile = eeAlter(tile);       //EE != tile
+                
+                //if((EE.X > (tile.X+1)) && (EE.X < (tile.X-1)) && (EE.Y > (tile.Y+1)) && (EE.Y < (tile.Y - 1)))
+                if ((sequence == 1) && (EE.X < (tile.X + 100)) && (EE.X > (tile.X - 100)) && (EE.Y < (tile.Y + 100)) && (EE.Y > (tile.Y - 100)))
+                {//Grab part
                     outByte[0] = (byte)Convert.ToInt32(one);  //joint1
                     outByte[1] = (byte)Convert.ToInt32(two);  //joint2
-                    outByte[2] = (byte)Convert.ToInt32(45);         //EE angle
-                    outByte[3] = (byte)Convert.ToInt32(0);
+                    outByte[2] = (byte)Convert.ToInt32(95);         //EE angle
+                    outByte[3] = (byte)Convert.ToInt32(1);
+                    
+                    sequence++;
                 }
-                else if ((EE.X > (tile.X+2)) && (EE.X > (tile.X-2)))
-                {
+                else if(sequence == 0)
+                {//Go to part
                     outByte[0] = (byte)Convert.ToInt32((int)one);  //joint1
                     outByte[1] = (byte)Convert.ToInt32((int)two);  //joint2
-                    outByte[2] = (byte)Convert.ToInt32(90);
-                    outByte[3] = (byte)Convert.ToInt32(1);
+                    outByte[2] = (byte)Convert.ToInt32(30);
+                    outByte[3] = (byte)Convert.ToInt32(0);
+                    sequence++;
                 }
+                else if(sequence == 2)
+                {//move to drop zone alpha
+                    outByte[0] = (byte)Convert.ToInt32(0);  //joint1
+                    outByte[1] = (byte)Convert.ToInt32(90);  //joint2
+                    outByte[2] = (byte)Convert.ToInt32(30);
+                    outByte[3] = (byte)Convert.ToInt32(1);
+                    sequence++;
+                }
+                else if(sequence == 3)
+                {//turn off magnet
+                    outByte[0] = (byte)Convert.ToInt32(0);  //joint1
+                    outByte[1] = (byte)Convert.ToInt32(90);  //joint2
+                    outByte[2] = (byte)Convert.ToInt32(30);
+                    outByte[3] = (byte)Convert.ToInt32(0);
+                    sequence++;
+                }
+                else if(sequence == 4)
+                {//move out of the way
+                    outByte[0] = (byte)Convert.ToInt32(45);  //joint1
+                    outByte[1] = (byte)Convert.ToInt32(60);  //joint2
+                    outByte[2] = (byte)Convert.ToInt32(40);
+                    outByte[3] = (byte)Convert.ToInt32(0);
+                    sequence = 0;
+                }
+
+                
             }
+            //if ((point.X < (data.getBox().X + 2) && point.X > (data.getBox().X - 2)) &&
+            //       (point.Y < (data.getBox().Y + 2) & point.Y > (data.getBox().Y - 2)))
 
             if (serPort.IsOpen)
             {
@@ -639,20 +679,20 @@ namespace pick_place_robot_GUI
             //updateScara();
         }
 
-        private void radioButton4_CheckedChanged(object sender, EventArgs e)
+        private void radioButton4_CheckedChanged(object sender, EventArgs e)    //pick
         {
             textBox3.Text = Convert.ToString(90);
             checkBox1.Checked = true;
             button9.PerformClick();
         }
 
-        private void radioButton5_CheckedChanged(object sender, EventArgs e)
+        private void radioButton5_CheckedChanged(object sender, EventArgs e)    //move
         {
             textBox3.Text = Convert.ToString(40);
             button9.PerformClick();
         }
 
-        private void radioButton6_CheckedChanged(object sender, EventArgs e)
+        private void radioButton6_CheckedChanged(object sender, EventArgs e)    //drop
         {
             textBox3.Text = Convert.ToString(25);
             button9.PerformClick();
@@ -764,7 +804,7 @@ namespace pick_place_robot_GUI
             if(identifier == 0)
             {
                 if ((point.X < (data.getBox().X + 2) && point.X > (data.getBox().X - 2)) &&
-                     (point.Y < (data.getBox().Y + 2) & point.Y > (data.getBox().Y - 2)))
+                     (point.Y < (data.getBox().Y + 2) && point.Y > (data.getBox().Y - 2)))
                     return true;
                 else
                     return false;
@@ -800,7 +840,41 @@ namespace pick_place_robot_GUI
         {
             Bicep_Length.Value = (decimal)152.5;
             Forearm_Length.Value = (decimal)62;
+            X_Proportional.Value = (decimal)1.1925;
+            X_plus.Value = (decimal)37.566;
+            Y_Proportional.Value = (decimal)1.2137;
+            Y_plus.Value = (decimal)12.925;
         }
 
+        private PointF eeAlter(PointF point)
+        {
+            //y= 1.2519*y - 22.875
+            //x= 1.1988*x - 35.531
+
+            point.X = (float)(X_multiple * point.X - X_addition);
+            point.Y = (float)(Y_multiple * point.Y - Y_addition);
+
+            return point;
+        }
+
+        private void numericUpDown3_ValueChanged(object sender, EventArgs e)
+        {
+            Y_multiple = (double)Y_Proportional.Value;
+        }
+
+        private void X_Proportional_ValueChanged(object sender, EventArgs e)
+        {
+            X_multiple = (double)X_Proportional.Value;
+        }
+
+        private void X_plus_ValueChanged(object sender, EventArgs e)
+        {
+            X_addition = (double)X_plus.Value;
+        }
+
+        private void Y_plus_ValueChanged(object sender, EventArgs e)
+        {
+            Y_addition = (double)Y_plus.Value;
+        }
     }
 }
