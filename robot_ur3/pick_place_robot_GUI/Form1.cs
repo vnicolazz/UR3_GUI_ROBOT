@@ -58,6 +58,9 @@ namespace pick_place_robot_GUI
         int Ser_Alternate;
         byte[] outByte = new byte[4];
 
+        double A_Length;
+        double B_Length;
+
         PointF eb_center = new PointF(5, 5);
         SizeF eb_size = new SizeF(10, 10);
         PointF mb_center = new PointF(5, 5);
@@ -103,6 +106,10 @@ namespace pick_place_robot_GUI
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            Bicep_Length.Value = (decimal)152.5;
+            Forearm_Length.Value = (decimal)62;
+            A_Length = (int)Bicep_Length.Value;
+            B_Length = (int)Forearm_Length.Value;
             trackBar6.Value = threshold;
             radioButton1.Checked = true;
             trackBar4.Value = 45;
@@ -117,7 +124,7 @@ namespace pick_place_robot_GUI
             SerReady = true;
             Ser_Alternate = 0;
 
-            _capture = new Capture(1);
+            _capture = new Capture(0);
             _capture.ImageGrabbed += Display_Captured;	//grab event handler
             _capture.Start();
         }
@@ -411,7 +418,7 @@ namespace pick_place_robot_GUI
                     outByte[2] = (byte)Convert.ToInt32(45);         //EE angle
                     outByte[3] = (byte)Convert.ToInt32(0);
                 }
-                else if (EE == tile)
+                else if ((EE.X > (tile.X+2)) && (EE.X > (tile.X-2)))
                 {
                     outByte[0] = (byte)Convert.ToInt32((int)one);  //joint1
                     outByte[1] = (byte)Convert.ToInt32((int)two);  //joint2
@@ -446,13 +453,14 @@ namespace pick_place_robot_GUI
                     if(SerReady)
                     {
                         serPort.Write(outByte, 0, outByte.Length);
+                        SerReady = false;
                     }
                 }
             }
             //End of updata SCARA
         }
 
-#region Form Control
+        #region Form Control
         public int pixel_counter(Image<Bgr, Byte> image)
         {
             int pixel_count = 0;
@@ -729,8 +737,8 @@ namespace pick_place_robot_GUI
             LineSegment2DF sideC = new LineSegment2DF(jE, j1);          //create hypotenuse line
             //LineSegment2DF newSideC = new LineSegment2DF(j1, destination);
 
-            double a_lgth = sideA.Length;
-            double b_lgth = sideB.Length;
+            double a_lgth = A_Length;
+            double b_lgth = B_Length;
             double c_lgth = sideC.Length;                               //get hypotenuse length
             double ang_a;
             double ang_b;
@@ -776,6 +784,22 @@ namespace pick_place_robot_GUI
         private void checkBox2_CheckedChanged(object sender, EventArgs e)
         {
             button9.PerformClick();
+        }
+
+        private void Bicep_Length_ValueChanged(object sender, EventArgs e)
+        {
+            A_Length = (int)Bicep_Length.Value;
+        }
+
+        private void Forearm_Length_ValueChanged(object sender, EventArgs e)
+        {
+            B_Length = (int)Forearm_Length.Value;
+        }
+
+        private void Reset_Lengths_Click(object sender, EventArgs e)
+        {
+            Bicep_Length.Value = (decimal)152.5;
+            Forearm_Length.Value = (decimal)62;
         }
 
     }
